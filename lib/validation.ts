@@ -111,6 +111,12 @@ export const paginationSchema = z.object({
   limit: z.coerce.number().int().min(1).max(500).default(20),
 })
 
+/** For /api/trucks: browse page may request a high limit to list the full certified inventory. */
+export const trucksListPaginationSchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(1000).default(20),
+})
+
 // OTP request validation
 export const otpRequestSchema = z.object({
   phone: z.string().min(10, 'Phone number must be at least 10 characters').max(20),
