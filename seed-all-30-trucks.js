@@ -27,7 +27,7 @@ const trucks = [
     price: 750000,
     image_url: '/trucks/eicher-truck-1.webp',
     subtitle: 'Compact and efficient for city deliveries.',
-    certified: true,
+    certified: false,
     location: 'Mumbai (MH-01)',
     city: 'Mumbai',
     state: 'Maharashtra'
@@ -42,7 +42,7 @@ const trucks = [
     price: 650000,
     image_url: '/trucks/truck3-image-2.png',
     subtitle: 'Reliable and fuel-efficient.',
-    certified: true,
+    certified: false,
     location: 'Pune (MH-12)',
     city: 'Pune',
     state: 'Maharashtra'
@@ -57,7 +57,7 @@ const trucks = [
     price: 550000,
     image_url: '/trucks/truck4-image-1.png',
     subtitle: 'Versatile medium duty truck.',
-    certified: true,
+    certified: false,
     location: 'Mumbai (MH-02)',
     city: 'Mumbai',
     state: 'Maharashtra'
@@ -72,7 +72,7 @@ const trucks = [
     price: 680000,
     image_url: '/trucks/truck5-image-2.png',
     subtitle: 'Modern design with excellent fuel economy.',
-    certified: true,
+    certified: false,
     location: 'Nagpur (MH-31)',
     city: 'Nagpur',
     state: 'Maharashtra'
@@ -87,7 +87,7 @@ const trucks = [
     price: 780000,
     image_url: '/trucks/truck6-image-2.jpg',
     subtitle: 'Powerful and efficient.',
-    certified: true,
+    certified: false,
     location: 'Nashik (MH-15)',
     city: 'Nashik',
     state: 'Maharashtra'
@@ -102,7 +102,7 @@ const trucks = [
     price: 800000,
     image_url: '/trucks/truck7-image-2.png',
     subtitle: 'Heavy-duty truck for long hauls.',
-    certified: true,
+    certified: false,
     location: 'Thane (MH-04)',
     city: 'Thane',
     state: 'Maharashtra'
@@ -117,7 +117,7 @@ const trucks = [
     price: 720000,
     image_url: '/trucks/truck8-image-1.png',
     subtitle: 'Extended power variant for heavy loads.',
-    certified: true,
+    certified: false,
     location: 'Aurangabad (MH-20)',
     city: 'Aurangabad',
     state: 'Maharashtra'
@@ -132,7 +132,7 @@ const trucks = [
     price: 690000,
     image_url: '/trucks/truck9-image-1.png',
     subtitle: 'Ultra-efficient commercial vehicle.',
-    certified: true,
+    certified: false,
     location: 'Solapur (MH-13)',
     city: 'Solapur',
     state: 'Maharashtra'
@@ -147,7 +147,7 @@ const trucks = [
     price: 640000,
     image_url: '/trucks/truck10-image-1.jpg',
     subtitle: 'Efficient and reliable.',
-    certified: true,
+    certified: false,
     location: 'Kolhapur (MH-09)',
     city: 'Kolhapur',
     state: 'Maharashtra'
@@ -162,7 +162,7 @@ const trucks = [
     price: 660000,
     image_url: '/trucks/truck11-image-1.png',
     subtitle: 'Extended power for demanding applications.',
-    certified: true,
+    certified: false,
     location: 'Sangli (MH-10)',
     city: 'Sangli',
     state: 'Maharashtra'
@@ -177,7 +177,7 @@ const trucks = [
     price: 740000,
     image_url: '/trucks/truck12-image-1.png',
     subtitle: 'Powerful medium-duty truck.',
-    certified: true,
+    certified: false,
     location: 'Satara (MH-11)',
     city: 'Satara',
     state: 'Maharashtra'
@@ -192,7 +192,7 @@ const trucks = [
     price: 790000,
     image_url: '/trucks/truck19-image-1.png',
     subtitle: 'Powerful and reliable.',
-    certified: true,
+    certified: false,
     location: 'Jalgaon (MH-19)',
     city: 'Jalgaon',
     state: 'Maharashtra'
@@ -207,7 +207,7 @@ const trucks = [
     price: 670000,
     image_url: '/trucks/truck14-image-1.png',
     subtitle: 'Reliable partner for your business.',
-    certified: true,
+    certified: false,
     location: 'Akola (MH-30)',
     city: 'Akola',
     state: 'Maharashtra'
@@ -222,7 +222,7 @@ const trucks = [
     price: 710000,
     image_url: '/trucks/truck15-image-1.png',
     subtitle: 'Powerful and durable.',
-    certified: true,
+    certified: false,
     location: 'Amravati (MH-27)',
     city: 'Amravati',
     state: 'Maharashtra'
@@ -237,7 +237,7 @@ const trucks = [
     price: 730000,
     image_url: '/trucks/truck16-image-1.png',
     subtitle: 'Extended power for heavy loads.',
-    certified: true,
+    certified: false,
     location: 'Latur (MH-24)',
     city: 'Latur',
     state: 'Maharashtra'
@@ -252,7 +252,7 @@ const trucks = [
     price: 700000,
     image_url: '/trucks/truck17-image-1.png',
     subtitle: 'Eco-friendly and efficient.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-01)',
     city: 'Delhi',
     state: 'Delhi'
@@ -267,7 +267,7 @@ const trucks = [
     price: 560000,
     image_url: '/trucks/truck19-image-1.png',
     subtitle: 'Powerful and reliable.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-03)',
     city: 'Delhi',
     state: 'Delhi'
@@ -282,7 +282,7 @@ const trucks = [
     price: 580000,
     image_url: '/trucks/truck20-image-1.png',
     subtitle: 'Advanced technology and efficiency.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-04)',
     city: 'Delhi',
     state: 'Delhi'
@@ -297,7 +297,7 @@ const trucks = [
     price: 680000,
     image_url: '/trucks/truck22-image-1.png',
     subtitle: 'Versatile commercial vehicle.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-06)',
     city: 'Delhi',
     state: 'Delhi'
@@ -312,7 +312,7 @@ const trucks = [
     price: 650000,
     image_url: '/trucks/truck17-image-1.png',
     subtitle: 'Eco-friendly and efficient.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-07)',
     city: 'Delhi',
     state: 'Delhi'
@@ -327,7 +327,7 @@ const trucks = [
     price: 770000,
     image_url: '/trucks/truck5-image-2.png',
     subtitle: 'Extended power with modern features.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-08)',
     city: 'Delhi',
     state: 'Delhi'
@@ -417,7 +417,7 @@ const trucks = [
     price: 750000,
     image_url: '/trucks/truck31-image-1.png',
     subtitle: 'Versatile medium duty truck.',
-    certified: true,
+    certified: false,
     location: 'Chandigarh (CH-01)',
     city: 'Chandigarh',
     state: 'Chandigarh'

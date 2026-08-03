@@ -99,7 +99,7 @@ const trucks = [
     price: 740000,
     image_url: '/Gemini_Generated_Image_ex5b2aex5b2aex5b.png',
     subtitle: 'Modern design with excellent fuel economy.',
-    certified: true
+    certified: false
   },
   {
     name: 'Eicher Pro 2110',
