@@ -342,7 +342,7 @@ const trucks = [
     price: 620000,
     image_url: '/trucks/truck25-image-1.png',
     subtitle: 'Japanese quality and reliability.',
-    certified: true,
+    certified: false,
     location: 'Delhi (DL-09)',
     city: 'Delhi',
     state: 'Delhi'
@@ -357,7 +357,7 @@ const trucks = [
     price: 630000,
     image_url: '/trucks/truck21-image-1.png',
     subtitle: 'Extended power variant.',
-    certified: true,
+    certified: false,
     location: 'Pune (MH-12)',
     city: 'Pune',
     state: 'Maharashtra'
@@ -372,7 +372,7 @@ const trucks = [
     price: 610000,
     image_url: '/trucks/truck28-image-1.png',
     subtitle: 'Light commercial vehicle.',
-    certified: true,
+    certified: false,
     location: 'Chandigarh (CH-01)',
     city: 'Chandigarh',
     state: 'Chandigarh'
@@ -387,7 +387,7 @@ const trucks = [
     price: 670000,
     image_url: '/trucks/truck29-image-1.png',
     subtitle: 'Upgraded light commercial vehicle.',
-    certified: true,
+    certified: false,
     location: 'Chandigarh (CH-01)',
     city: 'Chandigarh',
     state: 'Chandigarh'
@@ -402,7 +402,7 @@ const trucks = [
     price: 680000,
     image_url: '/trucks/truck30-image-1.png',
     subtitle: 'Reliable medium-duty truck.',
-    certified: true,
+    certified: false,
     location: 'Chandigarh (CH-01)',
     city: 'Chandigarh',
     state: 'Chandigarh'
