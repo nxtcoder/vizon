@@ -2944,65 +2944,11 @@ export default function TruckDetailsPage() {
                 ))}
               </div>
 
-              {/* PDF Reports Section - For Tata Ace Gold (7908) – details verified with Web Report UP14HT7908 */}
+              {/* PDF Reports Section - For Tata Ace Gold (7908) */}
               {isTataAceGold7908 && (
                 <div className="td-pdf-reports-section" style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #e5e7eb' }}>
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
-                  <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>Vehicle details on this page are aligned with the Web Report (UP14HT7908). Use the reports below to verify.</p>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/Tata%20Ace%20Gold%20(7908)-20260307T052536Z-1-001/Tata%20Ace%20Gold%20(7908)/WEB%20REPORT%20UP14HT7908.pdf"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        padding: '1rem',
-                        backgroundColor: '#f0fdf4',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #bbf7d0',
-                        textDecoration: 'none',
-                        color: '#111827',
-                        transition: 'all 0.2s',
-                        cursor: 'pointer'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#dcfce7'
-                        e.currentTarget.style.borderColor = '#86efac'
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#f0fdf4'
-                        e.currentTarget.style.borderColor = '#bbf7d0'
-                      }}
-                    >
-                      <div style={{
-                        width: '48px',
-                        height: '48px',
-                        borderRadius: '0.5rem',
-                        backgroundColor: '#16a34a',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                          <polyline points="14 2 14 8 20 8"/>
-                          <line x1="16" y1="13" x2="8" y2="13"/>
-                          <line x1="16" y1="17" x2="8" y2="17"/>
-                        </svg>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Web Report (UP14HT7908)</div>
-                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Primary reference for vehicle details — verify specs, registration & compliance</div>
-                      </div>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                        <polyline points="15 3 21 3 21 9"/>
-                        <line x1="10" y1="14" x2="21" y2="3"/>
-                      </svg>
-                    </a>
                     <a
                       href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/Tata%20Ace%20Gold%20(7908)-20260307T052536Z-1-001/Tata%20Ace%20Gold%20(7908)/VEHICLE%20INSPECTION%20REPORT%20UP14HT7908.pdf"
                       target="_blank"
