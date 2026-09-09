@@ -26,3 +26,23 @@ export function rewriteTruckImagesStorageUrlToCurrentProject(url: string): strin
 export function rewriteTruckImagesStorageUrls(urls: string[]): string[] {
   return urls.map(rewriteTruckImagesStorageUrlToCurrentProject)
 }
+
+/**
+ * Extracts the top-level folder (Storage prefix) from a `truck-images` public URL,
+ * e.g. `.../truck-images/MH12AB1234/01-cabin.jpg` -> `MH12AB1234`.
+ * Returns null for non-bucket URLs or files sitting at the bucket root.
+ */
+export function truckImagesFolderFromUrl(url?: string | null): string | null {
+  if (!url || typeof url !== 'string') return null
+  const m = url
+    .trim()
+    .match(/^https?:\/\/[^/]+\/storage\/v1\/object\/public\/truck-images\/(.+)$/i)
+  if (!m?.[1]) return null
+  const parts = m[1].split('/').filter(Boolean)
+  if (parts.length < 2) return null
+  try {
+    return decodeURIComponent(parts[0])
+  } catch {
+    return parts[0]
+  }
+}

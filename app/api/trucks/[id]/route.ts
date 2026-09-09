@@ -24,6 +24,7 @@ type TruckWithNumberPrice = {
   // New fields for truck details
   fuel_type?: string | null
   rto?: string | null
+  registration_number?: string | null
   insurance_date?: string | null
   transmission?: string | null
   gearbox?: string | null
@@ -84,6 +85,7 @@ export async function GET(
           // New fields for truck details
           fuel_type: result.fuel_type ?? null,
           rto: result.rto ?? null,
+          registration_number: result.registration_number ?? null,
           insurance_date: result.insurance_date ?? null,
           transmission: result.transmission ?? null,
           gearbox: result.gearbox ?? null,

@@ -8,7 +8,7 @@ import {
   isLikelyRegistrationOrPermitUpload,
 } from '@/lib/truck-listing-images'
 import { collectPublicTruckMediaUrls } from '@/lib/truck-images-collect'
-import { rewriteTruckImagesStorageUrls } from '@/lib/supabase-storage'
+import { rewriteTruckImagesStorageUrls, truckImagesFolderFromUrl } from '@/lib/supabase-storage'
 
 const BUCKET_NAME = 'truck-images'
 
@@ -335,6 +335,9 @@ export async function GET(request: Request) {
     
     const { searchParams } = new URL(request.url)
     const truckName = searchParams.get('truckName')
+    // Optional hints: uploads are often foldered by registration number, not truck name.
+    const imageUrlHint = searchParams.get('imageUrl')
+    const registrationNumberHint = searchParams.get('registrationNumber')
     const debug = searchParams.get('debug') === '1' || searchParams.get('debug') === 'true'
     
     if (!truckName) {
@@ -526,10 +529,23 @@ export async function GET(request: Request) {
     console.log(`[API] Using folder: ${folderName}`)
 
     let effectiveFolder = folderName
-    let imageSource: 'supabase-storage' | 'supabase-alternative-folder' | 'mapping-fallback' =
-      'supabase-storage'
+    let imageSource:
+      | 'supabase-storage'
+      | 'supabase-hinted-folder'
+      | 'supabase-alternative-folder'
+      | 'mapping-fallback' = 'supabase-storage'
 
     let imageUrls = rewriteTruckImagesStorageUrls(await collectPublicTruckMediaUrls(supabase, folderName))
+
+    // Folders hinted by the truck record itself (hero image path / registration number).
+    // Uploads are commonly stored under a registration-number folder, which never matches the truck name.
+    const hintedFolders = [
+      truckImagesFolderFromUrl(imageUrlHint),
+      registrationNumberHint?.trim() || null,
+      registrationNumberHint?.trim().toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_') || null,
+    ]
+      .filter((f): f is string => !!f && f !== folderName)
+      .filter((f, i, arr) => arr.indexOf(f) === i)
 
     const flatListMediaUrls = async (storagePrefix: string): Promise<string[]> => {
       const { data: files, error } = await supabase.storage.from(BUCKET_NAME).list(storagePrefix, {
@@ -571,6 +587,22 @@ export async function GET(request: Request) {
 
     if (imageUrls.length === 0) {
       imageUrls = await flatListMediaUrls(folderName)
+    }
+
+    if (imageUrls.length === 0) {
+      for (const hinted of hintedFolders) {
+        const hintedUrls = rewriteTruckImagesStorageUrls(
+          await collectPublicTruckMediaUrls(supabase, hinted)
+        )
+        const urls = hintedUrls.length > 0 ? hintedUrls : await flatListMediaUrls(hinted)
+        if (urls.length > 0) {
+          imageUrls = urls
+          effectiveFolder = hinted
+          imageSource = 'supabase-hinted-folder'
+          console.log(`[API] Found ${urls.length} images in hinted folder: ${hinted}`)
+          break
+        }
+      }
     }
 
     if (imageUrls.length === 0) {

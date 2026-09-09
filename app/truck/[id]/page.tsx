@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -9,6 +9,8 @@ import Navbar from '@/components/Navbar'
 import { publicTruckImagesRoot } from '@/lib/supabase-storage'
 
 const TRUCK_IMAGES_BASE = publicTruckImagesRoot()
+
+const isVideoUrl = (url?: string | null) => /\.(mp4|mov|webm)(\?|$)/i.test(url || '')
 
 // Function to get inspection data based on truck
 const getInspectionData = (truckName: string | null | undefined) => {
@@ -656,6 +658,9 @@ export default function TruckDetailsPage() {
   const [expandedItems, setExpandedItems] = useState<string[]>(['coreSystems'])
   const [isVisible, setIsVisible] = useState(false)
   const [fetchedImages, setFetchedImages] = useState<string[]>([])
+  const thumbStripRef = useRef<HTMLDivElement>(null)
+  // Browsers without an H.264 decoder (e.g. Firefox snap builds) can't play these MP4s
+  const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({})
   const [fetchedReports, setFetchedReports] = useState<Array<{originalName: string, supabaseUrl: string}>>([])
   
   // Finance Calculator
@@ -727,6 +732,17 @@ export default function TruckDetailsPage() {
     setIsVisible(true)
   }, [loadTruckData])
 
+  // Keep the selected thumbnail in view; the strip holds every image, so it must scroll.
+  useEffect(() => {
+    const strip = thumbStripRef.current
+    const active = strip?.querySelector<HTMLElement>('.td-thumb.active')
+    if (!strip || !active) return
+    strip.scrollTo({
+      left: active.offsetLeft - strip.clientWidth / 2 + active.clientWidth / 2,
+      behavior: 'smooth',
+    })
+  }, [selectedImageIndex, fetchedImages])
+
   useEffect(() => {
     if (truck) {
       const isAceGold7908 = truck.name === 'Tata Ace Gold (7908)' || (truck.name?.includes?.('Tata Ace Gold') && truck.name?.includes?.('7908'))
@@ -766,9 +782,15 @@ export default function TruckDetailsPage() {
       const truckName = truck.name || ''
       
       if (truckName) {
+        // Pass the truck's own hero image / registration number so the API can find
+        // gallery folders that are named by registration number instead of truck name.
+        const imageParams = new URLSearchParams({ truckName })
+        if (truck.imageUrl) imageParams.set('imageUrl', truck.imageUrl)
+        const registrationNumber = truck.registrationNumber || truck.registration_number
+        if (registrationNumber) imageParams.set('registrationNumber', registrationNumber)
         console.log(`[Truck Details] 🚀 Fetching images for truck: "${truckName}"`)
-        console.log(`[Truck Details] API URL: /api/truck-images?truckName=${encodeURIComponent(truckName)}`)
-        fetch(`/api/truck-images?truckName=${encodeURIComponent(truckName)}`, {
+        console.log(`[Truck Details] API URL: /api/truck-images?${imageParams.toString()}`)
+        fetch(`/api/truck-images?${imageParams.toString()}`, {
           cache: 'no-store',
         })
           .then(res => {
@@ -1898,8 +1920,8 @@ export default function TruckDetailsPage() {
       console.warn(`[getGalleryImages] Tata 609g has no gallery images in storage; using main image fallback. (truck: "${truckName}")`)
     }
     
-    // Default: repeat the main image
-    return [truck.imageUrl, truck.imageUrl, truck.imageUrl, truck.imageUrl]
+    // Default: only the main image (repeating it just renders the same photo N times)
+    return [truck.imageUrl]
   }
 
   const effectivePrice = truck ? (
@@ -2085,15 +2107,8 @@ export default function TruckDetailsPage() {
   }
 
   const gallery = getGalleryImages()
-  const VISIBLE_THUMBS = 10
-  const totalThumbs = gallery.length
-  let thumbStartIndex = Math.max(0, selectedImageIndex - Math.floor(VISIBLE_THUMBS / 2))
-  let thumbEndIndex = thumbStartIndex + VISIBLE_THUMBS
-  if (thumbEndIndex > totalThumbs) {
-    thumbEndIndex = totalThumbs
-    thumbStartIndex = Math.max(0, thumbEndIndex - VISIBLE_THUMBS)
-  }
-  const visibleThumbs = gallery.slice(thumbStartIndex, thumbEndIndex)
+  // Index can outlive a shorter gallery (fallback list -> fetched list and back)
+  const activeIndex = gallery.length > 0 ? Math.min(selectedImageIndex, gallery.length - 1) : 0
   const inspectionData = getInspectionData(truck?.name)
   const overallScore = (Object.values(inspectionData).reduce((acc, cat) => acc + cat.score, 0) / Object.keys(inspectionData).length).toFixed(1)
 
@@ -2126,9 +2141,43 @@ export default function TruckDetailsPage() {
         <div className="td-gallery">
           <div className="td-main-image">
             {(() => {
-              const imageSrc = gallery[selectedImageIndex] || '/placeholder.jpg'
+              const imageSrc = gallery[activeIndex] || '/placeholder.jpg'
               const isExternal = imageSrc?.includes('supabase.co') || imageSrc?.startsWith('http')
-              
+
+              if (isVideoUrl(imageSrc)) {
+                if (videoErrors[imageSrc]) {
+                  return (
+                    <div className="td-video-fallback">
+                      <span className="td-video-fallback-icon" aria-hidden="true">▶</span>
+                      <p>This browser can&apos;t play this video.</p>
+                      <a href={imageSrc} target="_blank" rel="noopener noreferrer">
+                        Open video in a new tab
+                      </a>
+                    </div>
+                  )
+                }
+                return (
+                  <video
+                    key={imageSrc}
+                    src={imageSrc}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    crossOrigin="anonymous"
+                    onError={() => setVideoErrors(prev => ({ ...prev, [imageSrc]: true }))}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      background: '#000',
+                    }}
+                  />
+                )
+              }
+
               if (isExternal) {
                 return (
                   <img
@@ -2161,7 +2210,7 @@ export default function TruckDetailsPage() {
             })()}
             <button 
               className="td-nav-btn prev"
-              onClick={() => setSelectedImageIndex(prev => prev > 0 ? prev - 1 : gallery.length - 1)}
+              onClick={() => setSelectedImageIndex(activeIndex > 0 ? activeIndex - 1 : gallery.length - 1)}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M15 18l-6-6 6-6"/>
@@ -2169,7 +2218,7 @@ export default function TruckDetailsPage() {
             </button>
             <button 
               className="td-nav-btn next"
-              onClick={() => setSelectedImageIndex(prev => prev < gallery.length - 1 ? prev + 1 : 0)}
+              onClick={() => setSelectedImageIndex(activeIndex < gallery.length - 1 ? activeIndex + 1 : 0)}
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M9 18l6-6-6-6"/>
@@ -2181,33 +2230,68 @@ export default function TruckDetailsPage() {
               </svg>
               Axlerator Assured
             </div>
-            <div className="td-image-dots">
-              {gallery.map((_, idx) => (
-                <button 
-                  key={idx}
-                  className={`td-dot ${idx === selectedImageIndex ? 'active' : ''}`}
-                  onClick={() => setSelectedImageIndex(idx)}
-                />
-              ))}
-            </div>
+            {gallery.length > 1 && (
+              gallery.length <= 12 ? (
+                <div className="td-image-dots">
+                  {gallery.map((_, idx) => (
+                    <button
+                      key={idx}
+                      className={`td-dot ${idx === activeIndex ? 'active' : ''}`}
+                      onClick={() => setSelectedImageIndex(idx)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="td-image-counter">
+                  {activeIndex + 1} / {gallery.length}
+                </div>
+              )
+            )}
           </div>
-          <div className="td-thumbs">
-            {visibleThumbs.map((img, idx) => {
-              const realIndex = thumbStartIndex + idx
+          <div className="td-thumbs" ref={thumbStripRef}>
+            {gallery.map((img, idx) => {
               return (
                 <button
-                  key={realIndex}
-                  className={`td-thumb ${realIndex === selectedImageIndex ? 'active' : ''}`}
-                  onClick={() => setSelectedImageIndex(realIndex)}
+                  key={`${idx}-${img}`}
+                  className={`td-thumb ${idx === activeIndex ? 'active' : ''}`}
+                  onClick={() => setSelectedImageIndex(idx)}
                 >
                   {(() => {
                     const isExternal = img?.includes('supabase.co') || img?.startsWith('http')
-                    
+
+                    if (isVideoUrl(img)) {
+                      return (
+                        <>
+                          {!videoErrors[img] && (
+                          <video
+                            src={img}
+                            muted
+                            playsInline
+                            preload="metadata"
+                            crossOrigin="anonymous"
+                            onError={() => setVideoErrors(prev => ({ ...prev, [img]: true }))}
+                            style={{
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              background: '#000',
+                            }}
+                          />
+                          )}
+                          <span className="td-thumb-play" aria-hidden="true">▶</span>
+                        </>
+                      )
+                    }
+
                     if (isExternal) {
                       return (
                         <img
                           src={img}
                           alt=""
+                          loading="lazy"
                           crossOrigin="anonymous"
                           referrerPolicy="no-referrer"
                           style={{ 

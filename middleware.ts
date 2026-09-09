@@ -17,6 +17,15 @@ export function middleware(request: NextRequest) {
   response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('Referrer-Policy', 'origin-when-cross-origin')
   
+  // Storage-hosted gallery media (images + videos) lives on the Supabase origin
+  const supabaseMediaOrigin = (() => {
+    try {
+      return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || '').origin
+    } catch {
+      return ''
+    }
+  })()
+
   // Content Security Policy
   const csp = [
     "default-src 'self'",
@@ -26,7 +35,7 @@ export function middleware(request: NextRequest) {
     "font-src 'self' data:",
     "connect-src 'self' https://api.emailjs.com",
     "frame-src 'self' https://www.google.com",
-    "media-src 'self'",
+    `media-src 'self' blob: data:${supabaseMediaOrigin ? ` ${supabaseMediaOrigin}` : ' https:'}`,
   ].join('; ')
   response.headers.set('Content-Security-Policy', csp)
 
