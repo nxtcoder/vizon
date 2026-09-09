@@ -266,7 +266,13 @@ function getFolderName(truckName: string): string | null {
   // Check for Ashok Leyland variations
   if (normalizedName.includes('ashok') && normalizedName.includes('leyland')) {
     if (normalizedName.includes('1615')) {
-      return 'ASHOK_LEYLAND_ECOMET_STAR_1615_HE'
+      // Two distinct trucks exist for 1615:
+      //  - "ASHOK LEYLAND ECOMET STAR 1615 HE"  (with space before HE) -> ..._1615_HE
+      //  - "Ashok Leyland Ecomet Star 1615HE"    (no space before HE)   -> ..._1615HE
+      if (normalizedName.includes('1615 he')) {
+        return 'ASHOK_LEYLAND_ECOMET_STAR_1615_HE'
+      }
+      return 'ASHOK_LEYLAND_ECOMET_STAR_1615HE'
     } else if (normalizedName.includes('1415')) {
       return 'ASHOK_LEYLAND_ECOMET_STAR_1415_HE'
     }
