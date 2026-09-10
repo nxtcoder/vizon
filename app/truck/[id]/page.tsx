@@ -12,6 +12,29 @@ const TRUCK_IMAGES_BASE = publicTruckImagesRoot()
 
 const isVideoUrl = (url?: string | null) => /\.(mp4|mov|webm)(\?|$)/i.test(url || '')
 
+/**
+ * Inspection payload capacities are free text: render tonnes when the value
+ * parses as a kg figure, otherwise the note as written.
+ */
+const formatLoadCapacity = (raw: unknown): { text: string; tonnes: boolean } | null => {
+  if (raw === null || raw === undefined) return null
+  const s = String(raw).trim()
+  if (!s) return null
+  const digits = s.replace(/[^0-9.]/g, '')
+  const n = Number(digits)
+  if (digits && Number.isFinite(n) && n > 0) {
+    return n >= 1000 ? { text: (n / 1000).toFixed(2), tonnes: true } : { text: String(n), tonnes: true }
+  }
+  return { text: s, tonnes: false }
+}
+
+/** 1 -> "1st", 2 -> "2nd"; null when the record has no ownership count */
+const ownershipShort = (n?: number | null): string | null => {
+  if (n === null || n === undefined) return null
+  const suffix = n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'
+  return `${n}${suffix}`
+}
+
 // Function to get inspection data based on truck
 const getInspectionData = (truckName: string | null | undefined) => {
   // Tata Ace Gold (7908) – inspection ratings from quality report
@@ -661,6 +684,7 @@ export default function TruckDetailsPage() {
   const thumbStripRef = useRef<HTMLDivElement>(null)
   // Browsers without an H.264 decoder (e.g. Firefox snap builds) can't play these MP4s
   const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({})
+  const [lightboxOpen, setLightboxOpen] = useState(false)
   const [fetchedReports, setFetchedReports] = useState<Array<{originalName: string, supabaseUrl: string}>>([])
   
   // Finance Calculator
@@ -2109,6 +2133,27 @@ export default function TruckDetailsPage() {
   const gallery = getGalleryImages()
   // Index can outlive a shorter gallery (fallback list -> fetched list and back)
   const activeIndex = gallery.length > 0 ? Math.min(selectedImageIndex, gallery.length - 1) : 0
+
+  // Load-capacity figures: legacy trucks carry hardcoded specs, everything else
+  // reads its own trucks record.
+  // TODO: trucks has no payload_capacity_gross/_net/_ft column, so these always
+  // fall back to the placeholder figures below. See TODO.md.
+  const dbGrossLoad = formatLoadCapacity((truck as any).payload_capacity_gross)
+  const dbNetLoad = formatLoadCapacity((truck as any).payload_capacity_net)
+  const dbBodyLength = formatLoadCapacity((truck as any).payload_capacity_ft)
+  const hasLegacyLoadFigures = Boolean(
+    (isTata709gLPT && tata709gLPTDisplay) ||
+    (isTata1109gLPT && tata1109gLPTDisplay) ||
+    (isTata1212LPT && tata1212LPTDisplay) ||
+    (isEicherPro2110L && eicherPro2110LDisplay) ||
+    (isEicher2059XPTruck && eicher2059XPDisplay) ||
+    (isEicher1075HSDTruck && eicher1075HSDDisplay) ||
+    (isSmlIsuzuZT54 && smlIsuzuZT54Display) ||
+    (isBajajMaximaCNG && bajajMaximaCNGDisplay) ||
+    (isTata609G && tata609GDisplay) ||
+    isAshokLeylandTruck || isAshokLeyland1615Truck || isTata1412Truck || isSmlIsuzuTruck ||
+    isMahindraBoleroTruck || isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT
+  )
   const inspectionData = getInspectionData(truck?.name)
   const overallScore = (Object.values(inspectionData).reduce((acc, cat) => acc + cat.score, 0) / Object.keys(inspectionData).length).toFixed(1)
 
@@ -2185,13 +2230,15 @@ export default function TruckDetailsPage() {
                     alt={truck.name}
                     crossOrigin="anonymous"
                     referrerPolicy="no-referrer"
+                    onClick={() => setLightboxOpen(true)}
                     style={{ 
                       width: '100%', 
                       height: '100%', 
                       objectFit: 'cover',
                       position: 'absolute',
                       top: 0,
-                      left: 0
+                      left: 0,
+                      cursor: 'zoom-in'
                     }}
                     loading="eager"
                   />
@@ -2203,7 +2250,8 @@ export default function TruckDetailsPage() {
                   src={imageSrc}
                   alt={truck.name}
                   fill
-                  style={{ objectFit: 'cover' }}
+                  onClick={() => setLightboxOpen(true)}
+                  style={{ objectFit: 'cover', cursor: 'zoom-in' }}
                   priority
                 />
               )
@@ -2224,12 +2272,24 @@ export default function TruckDetailsPage() {
                 <path d="M9 18l6-6-6-6"/>
               </svg>
             </button>
-            <div className="td-certified-tag">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                <path d="M20 6L9 17l-5-5"/>
+            <button
+              className="td-expand-btn"
+              onClick={() => setLightboxOpen(true)}
+              aria-label="View full image"
+              title="View full image"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>
               </svg>
-              Axlerator Assured
-            </div>
+            </button>
+            {truck.certified && (
+              <div className="td-certified-tag">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+                Axlerator Assured
+              </div>
+            )}
             {gallery.length > 1 && (
               gallery.length <= 12 ? (
                 <div className="td-image-dots">
@@ -2460,12 +2520,12 @@ export default function TruckDetailsPage() {
             </div>
             <div className="td-stat-divider"></div>
             <div className="td-stat">
-              <span className="td-stat-value">Manual</span>
+              <span className="td-stat-value">{truck.transmission || 'Manual'}</span>
               <span className="td-stat-label">Transmission</span>
             </div>
             <div className="td-stat-divider"></div>
             <div className="td-stat">
-              <span className="td-stat-value">1st</span>
+              <span className="td-stat-value">{ownershipShort(truck.ownership_number) || '1st'}</span>
               <span className="td-stat-label">Owner</span>
             </div>
           </div>
@@ -2594,7 +2654,8 @@ export default function TruckDetailsPage() {
               <div className="td-specs-grid">
                 {(() => {
                   // Extract emission standard from subtitle
-                  let emissionStandard = 'Diesel (BS-VI)'
+                  // TODO: no emission-standard column exists; falls back to a default
+                  let emissionStandard = truck.fuel_type || 'Diesel (BS-VI)'
                   if (truck.subtitle) {
                     const subtitleParts = truck.subtitle.split('•')
                     if (subtitleParts.length > 0) {
@@ -2742,7 +2803,7 @@ export default function TruckDetailsPage() {
                     : isEicherPro2110L && eicherPro2110LDisplay ? eicherPro2110LDisplay.ownership
                     : isBajajMaximaCNG && bajajMaximaCNGDisplay ? bajajMaximaCNGDisplay.ownership
                     : ((truck as any).ownership_number != null && (truck as any).ownership_number !== undefined)
-                      ? `${(truck as any).ownership_number}${(truck as any).ownership_number === 1 ? 'st' : (truck as any).ownership_number === 2 ? 'nd' : (truck as any).ownership_number === 3 ? 'rd' : 'th'} Owner`
+                      ? `${ownershipShort((truck as any).ownership_number)} Owner`
                       : 'First Owner'
                   const specRows = [
                     { label: 'Year', value: yearValue },
@@ -2815,7 +2876,7 @@ export default function TruckDetailsPage() {
                                             ? '16.02'
                                             : isTata609G && tata609GDisplay
                                               ? (tata609GDisplay.grossPayloadKg / 1000).toFixed(2)
-                                              : '16.2'}{isBajajMaximaCNG && bajajMaximaCNGDisplay?.grossPayloadKg == null ? '' : <small>T</small>}
+                                              : (dbGrossLoad?.text ?? '16.2')}{(isBajajMaximaCNG && bajajMaximaCNGDisplay?.grossPayloadKg == null) || (!hasLegacyLoadFigures && dbGrossLoad && !dbGrossLoad.tonnes) ? '' : <small>T</small>}
                   </span>
                   <span className="td-load-label">{isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT || isTata1212LPT || isTata609G || isTata709gLPT || isTata1109gLPT || isEicherPro2110L || isBajajMaximaCNG || isEicher2059XPTruck || isEicher1075HSDTruck || isSmlIsuzuZT54 ? 'Gross Payload' : 'Gross Weight'}</span>
                 </div>
@@ -2853,7 +2914,7 @@ export default function TruckDetailsPage() {
                                             ? '8.62'
                                             : isTata609G && tata609GDisplay
                                               ? (tata609GDisplay.netPayloadKg / 1000).toFixed(3)
-                                              : '10'}{isBajajMaximaCNG && bajajMaximaCNGDisplay?.netPayloadKg == null ? '' : <small>T</small>}
+                                              : (dbNetLoad?.text ?? '10')}{(isBajajMaximaCNG && bajajMaximaCNGDisplay?.netPayloadKg == null) || (!hasLegacyLoadFigures && dbNetLoad && !dbNetLoad.tonnes) ? '' : <small>T</small>}
                   </span>
                   <span className="td-load-label">{isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT || isTata1212LPT || isTata609G || isTata709gLPT || isTata1109gLPT || isEicherPro2110L || isBajajMaximaCNG || isEicher2059XPTruck || isEicher1075HSDTruck || isSmlIsuzuZT54 ? 'Net Payload' : 'Payload'}</span>
                 </div>
@@ -2872,7 +2933,7 @@ export default function TruckDetailsPage() {
                       : isAshokLeyland1615Truck || isTata1412Truck || isSmlIsuzuTruck || isTata1512GLPT ? '22'
                       : isMahindraBoleroTruck ? '08'
                       : isTataAceGold7908 || isTataAceGoldPlain ? '7.2'
-                      : '20'}<small>ft</small>
+                      : (dbBodyLength?.text ?? '20')}<small>ft</small>
                   </span>
                   <span className="td-load-label">Body Length</span>
                 </div>
@@ -4592,6 +4653,118 @@ export default function TruckDetailsPage() {
           <Link href="/sell-truck" className="highlight">Sell Your Truck</Link>
         </div>
       </div>
+
+      {/* Full-image lightbox */}
+      {lightboxOpen && gallery.length > 0 && (
+        <div
+          className="td-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${truck.name} image ${activeIndex + 1} of ${gallery.length}`}
+          tabIndex={-1}
+          ref={(el) => {
+            if (el) {
+              el.focus()
+              document.body.style.overflow = 'hidden'
+            } else {
+              document.body.style.overflow = ''
+            }
+          }}
+          onClick={() => setLightboxOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setLightboxOpen(false)
+            if (e.key === 'ArrowLeft') {
+              setSelectedImageIndex(activeIndex > 0 ? activeIndex - 1 : gallery.length - 1)
+            }
+            if (e.key === 'ArrowRight') {
+              setSelectedImageIndex(activeIndex < gallery.length - 1 ? activeIndex + 1 : 0)
+            }
+          }}
+        >
+          <button
+            className="td-lightbox-close"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="Close"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+
+          {gallery.length > 1 && (
+            <>
+              <button
+                className="td-lightbox-nav prev"
+                aria-label="Previous image"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedImageIndex(activeIndex > 0 ? activeIndex - 1 : gallery.length - 1)
+                }}
+              >
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M15 18l-6-6 6-6"/>
+                </svg>
+              </button>
+              <button
+                className="td-lightbox-nav next"
+                aria-label="Next image"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedImageIndex(activeIndex < gallery.length - 1 ? activeIndex + 1 : 0)
+                }}
+              >
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </button>
+            </>
+          )}
+
+          <div className="td-lightbox-stage" onClick={(e) => e.stopPropagation()}>
+            {(() => {
+              const media = gallery[activeIndex]
+              if (isVideoUrl(media)) {
+                if (videoErrors[media]) {
+                  return (
+                    <div className="td-video-fallback">
+                      <span className="td-video-fallback-icon" aria-hidden="true">▶</span>
+                      <p>This browser can&apos;t play this video.</p>
+                      <a href={media} target="_blank" rel="noopener noreferrer">
+                        Open video in a new tab
+                      </a>
+                    </div>
+                  )
+                }
+                return (
+                  <video
+                    key={media}
+                    src={media}
+                    controls
+                    autoPlay
+                    playsInline
+                    crossOrigin="anonymous"
+                    onError={() => setVideoErrors(prev => ({ ...prev, [media]: true }))}
+                    className="td-lightbox-media"
+                  />
+                )
+              }
+              return (
+                <img
+                  src={media}
+                  alt={`${truck.name} — image ${activeIndex + 1}`}
+                  crossOrigin="anonymous"
+                  referrerPolicy="no-referrer"
+                  className="td-lightbox-media"
+                />
+              )
+            })()}
+          </div>
+
+          <div className="td-lightbox-counter">
+            {activeIndex + 1} / {gallery.length}
+          </div>
+        </div>
+      )}
 
       {/* Contact Modal */}
       {showContactForm && (

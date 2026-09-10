@@ -7813,6 +7813,120 @@ body:has(.contact-page) .search-icon,
   font-variant-numeric: tabular-nums;
 }
 
+/* Full-image lightbox */
+.td-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.94);
+  padding: 3.5rem 4.5rem;
+  outline: none;
+  animation: tdLightboxIn 0.15s ease-out;
+}
+
+@keyframes tdLightboxIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.td-lightbox-stage {
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* contain, so the whole frame is visible however tall or wide it is */
+.td-lightbox-media {
+  max-width: 100%;
+  max-height: calc(100vh - 7rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #000;
+}
+
+.td-lightbox-close,
+.td-lightbox-nav {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.td-lightbox-close:hover,
+.td-lightbox-nav:hover { background: rgba(255, 255, 255, 0.28); }
+
+.td-lightbox-close {
+  top: 1rem;
+  right: 1rem;
+  width: 42px;
+  height: 42px;
+}
+
+.td-lightbox-nav {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+}
+
+.td-lightbox-nav.prev { left: 1rem; }
+.td-lightbox-nav.next { right: 1rem; }
+
+.td-lightbox-counter {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-expand-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s;
+}
+
+.td-expand-btn:hover { background: rgba(15, 23, 42, 0.8); }
+
+@media (max-width: 640px) {
+  .td-lightbox { padding: 3.5rem 0.75rem; }
+  .td-lightbox-nav { width: 40px; height: 40px; }
+  .td-lightbox-nav.prev { left: 0.375rem; }
+  .td-lightbox-nav.next { right: 0.375rem; }
+}
+
 .td-video-fallback {
   position: absolute;
   inset: 0;
