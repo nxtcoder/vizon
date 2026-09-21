@@ -69,12 +69,12 @@ const FIELDS = [
   ['engine_capacity', 'Engine CC', true],
   ['gallery', 'Gallery images', true],
   ['videos', 'Videos', true],
-  ['web_report_url', 'Web report', true],
   ['quality_scores', 'Quality report scores', true],
 ]
 
 // Columns the DB has but app/truck/[id]/page.tsx doesn't read yet
-const NOT_READ_BY_PAGE = ['manufactured_on', 'emission_norm', 'engine_capacity', 'gallery', 'videos', 'web_report_url', 'quality_scores']
+// The site links only the legal and inspection reports; web_report_url isn't needed
+const NOT_READ_BY_PAGE = ['manufactured_on', 'engine_capacity', 'gallery', 'videos', 'quality_scores']
 
 // Data the page shows that has NO column/table at all (always hardcoded in code today)
 const NO_DB_SOURCE = [
