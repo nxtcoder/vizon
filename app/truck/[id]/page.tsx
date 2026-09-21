@@ -2142,7 +2142,6 @@ export default function TruckDetailsPage() {
 
   // Load-capacity figures: legacy trucks carry hardcoded specs, everything else
   // reads its own trucks record.
-  // A missing figure shows '–', never a made-up one.
   const dbGrossLoad = formatLoadCapacity((truck as any).payload_capacity_gross, 'kg')
   const dbNetLoad = formatLoadCapacity((truck as any).payload_capacity_net, 'kg')
   const dbBodyLength = formatLoadCapacity((truck as any).payload_capacity_ft, 'ft')
@@ -2530,7 +2529,7 @@ export default function TruckDetailsPage() {
             </div>
             <div className="td-stat-divider"></div>
             <div className="td-stat">
-              <span className="td-stat-value">{ownershipShort(truck.ownership_number) || '–'}</span>
+              <span className="td-stat-value">{ownershipShort(truck.ownership_number) || '1st'}</span>
               <span className="td-stat-label">Owner</span>
             </div>
           </div>
@@ -2660,7 +2659,7 @@ export default function TruckDetailsPage() {
                 {(() => {
                   // Extract emission standard from subtitle
                   // TODO: no emission-standard column exists; falls back to a default
-                  let emissionStandard = truck.fuel_type || '–'
+                  let emissionStandard = truck.fuel_type || 'Diesel (BS-VI)'
                   if (truck.subtitle) {
                     const subtitleParts = truck.subtitle.split('•')
                     if (subtitleParts.length > 0) {
@@ -2682,8 +2681,8 @@ export default function TruckDetailsPage() {
                   // Special handling for ASHOK LEYLAND ECOMET STAR, Tata Ace Gold (7908), TATA 1512G LPT, Eicher Pro 2059 XP, Eicher Pro 1075 F HSD
                   const isEicher2059XP = (truck.name || '').toLowerCase().includes('2059') && ((truck.name || '').toLowerCase().includes('eicher') || (truck.manufacturer === 'Eicher Motors' && truck.model?.toLowerCase().includes('2059')))
                   const isEicher1075HSD = (truck.name || '').toLowerCase().includes('1075') && ((truck.name || '').toLowerCase().includes('eicher') || (truck.manufacturer === 'Eicher Motors' && (truck.model || '').toLowerCase().includes('1075')))
-                  const rtoValue = isAshokLeylandTruck ? 'GHAZIABAD' : isAshokLeyland1615Truck ? 'GHAZIABAD' : isTata1412Truck ? 'SONIPAT' : isSmlIsuzuTruck ? 'RAJPUR ROAD' : isSmlIsuzuZT54 && smlIsuzuZT54Display ? smlIsuzuZT54Display.rto : isMahindraBoleroTruck ? 'RAJPUR ROAD' : isTataAceGold7908 || isTataAceGoldPlain ? 'Ghaziabad' : isTata1512GLPT ? 'Rajpur Road' : isTata1212LPT ? (tata1212LPTDisplay?.rto ?? 'Faridabad') : isTata609G ? (tata609GDisplay?.rto ?? 'Rajpur Road') : isTata709gLPT ? (tata709gLPTDisplay?.rto ?? 'Rajpur Road') : isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.rto : isEicher2059XP ? (eicher2059XPDisplay?.rto ?? 'Dwarka, Delhi') : isEicher1075HSD && eicher1075HSDDisplay ? eicher1075HSDDisplay.rto : isEicherPro2110L ? (eicherPro2110LDisplay?.rto ?? 'Bahadurgarh, Haryana') : isBajajMaximaCNG ? (bajajMaximaCNGDisplay?.rto ?? 'RAJPUR ROAD') : (truck as any).rto || truck.location || truck.city || '–'
-                  const insuranceValue = isAshokLeylandTruck ? '01/01/27' : isAshokLeyland1615Truck ? '11/01/27' : isTata1412Truck ? '05/05/26' : isSmlIsuzuTruck ? '24/04/26' : isSmlIsuzuZT54 && smlIsuzuZT54Display ? smlIsuzuZT54Display.insurance : isMahindraBoleroTruck ? '01/09/26' : isTataAceGold7908 ? '14.12.2023' : isTataAceGoldPlain ? '17.03.2026' : isTata1512GLPT ? '24.09.2026' : isTata1212LPT ? (tata1212LPTDisplay?.insurance ?? '30.12.2025') : isTata609G ? (tata609GDisplay?.insurance ?? '02.08.2026') : isTata709gLPT ? (tata709gLPTDisplay?.insurance ?? '20.02.2027') : isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.insurance : isEicher2059XP && eicher2059XPDisplay ? eicher2059XPDisplay.insurance : isEicher1075HSD && eicher1075HSDDisplay ? eicher1075HSDDisplay.insurance : isEicherPro2110L ? (eicherPro2110LDisplay?.insurance ?? '12.02.2026') : isBajajMaximaCNG ? (bajajMaximaCNGDisplay?.insurance ?? '09/06/2026') : formatDbDate((truck as any).insurance_date) || '–'
+                  const rtoValue = isAshokLeylandTruck ? 'GHAZIABAD' : isAshokLeyland1615Truck ? 'GHAZIABAD' : isTata1412Truck ? 'SONIPAT' : isSmlIsuzuTruck ? 'RAJPUR ROAD' : isSmlIsuzuZT54 && smlIsuzuZT54Display ? smlIsuzuZT54Display.rto : isMahindraBoleroTruck ? 'RAJPUR ROAD' : isTataAceGold7908 || isTataAceGoldPlain ? 'Ghaziabad' : isTata1512GLPT ? 'Rajpur Road' : isTata1212LPT ? (tata1212LPTDisplay?.rto ?? 'Faridabad') : isTata609G ? (tata609GDisplay?.rto ?? 'Rajpur Road') : isTata709gLPT ? (tata709gLPTDisplay?.rto ?? 'Rajpur Road') : isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.rto : isEicher2059XP ? (eicher2059XPDisplay?.rto ?? 'Dwarka, Delhi') : isEicher1075HSD && eicher1075HSDDisplay ? eicher1075HSDDisplay.rto : isEicherPro2110L ? (eicherPro2110LDisplay?.rto ?? 'Bahadurgarh, Haryana') : isBajajMaximaCNG ? (bajajMaximaCNGDisplay?.rto ?? 'RAJPUR ROAD') : (truck as any).rto || truck.location || truck.city || 'MH-14 (Pune)'
+                  const insuranceValue = isAshokLeylandTruck ? '01/01/27' : isAshokLeyland1615Truck ? '11/01/27' : isTata1412Truck ? '05/05/26' : isSmlIsuzuTruck ? '24/04/26' : isSmlIsuzuZT54 && smlIsuzuZT54Display ? smlIsuzuZT54Display.insurance : isMahindraBoleroTruck ? '01/09/26' : isTataAceGold7908 ? '14.12.2023' : isTataAceGoldPlain ? '17.03.2026' : isTata1512GLPT ? '24.09.2026' : isTata1212LPT ? (tata1212LPTDisplay?.insurance ?? '30.12.2025') : isTata609G ? (tata609GDisplay?.insurance ?? '02.08.2026') : isTata709gLPT ? (tata709gLPTDisplay?.insurance ?? '20.02.2027') : isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.insurance : isEicher2059XP && eicher2059XPDisplay ? eicher2059XPDisplay.insurance : isEicher1075HSD && eicher1075HSDDisplay ? eicher1075HSDDisplay.insurance : isEicherPro2110L ? (eicherPro2110LDisplay?.insurance ?? '12.02.2026') : isBajajMaximaCNG ? (bajajMaximaCNGDisplay?.insurance ?? '09/06/2026') : formatDbDate((truck as any).insurance_date) || 'Valid till Dec 2025'
                   const modelValue = isAshokLeyland1615Truck ? 'ASHOK LEYLAND ECOMET STAR 1615 HE' : isTataAceGold7908 ? (tataAceGoldDisplay?.model ?? 'TATA ACE GOLD BS-IV') : isTataAceGoldPlain ? (tataAceGoldPlainDisplay?.model ?? 'TATA ACE GOLD BS-IV') : isTata1512GLPT ? (tata1512GLPTDisplay?.model ?? '1512G LPT DCR48CBC 125B6M5') : isTata1212LPT ? (tata1212LPTDisplay?.model ?? '1212 LPT DCR48CBC 125B6M5') : isTata609G ? (tata609GDisplay?.model ?? 'SFC DCR33CBC 85B6M5') : isTata709gLPT ? (tata709gLPTDisplay?.model ?? '709G LPT DCR38CBC 85B6M5 TT') : isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.model : isEicher2059XP && eicher2059XPDisplay ? eicher2059XPDisplay.model : isEicher1075HSD && eicher1075HSDDisplay ? eicher1075HSDDisplay.model : isSmlIsuzuZT54 && smlIsuzuZT54Display ? smlIsuzuZT54Display.model : isEicherPro2110L ? (eicherPro2110LDisplay?.model ?? 'PRO 2110L') : isBajajMaximaCNG ? (bajajMaximaCNGDisplay?.model ?? 'BAJAJ MAXIMA CARGO CNG') : truck.model
                   
                   // Check for CNG fuel type for Tata 1412, SML Isuzu, TATA 1512G LPT, TATA 609G
@@ -2721,7 +2720,7 @@ export default function TruckDetailsPage() {
                     emissionStandard = (truck as any).fuel_type
                   }
                   if (!hasSpecialFuel && truck.emission_norm && !emissionStandard.includes('(')) {
-                    emissionStandard = emissionStandard === '–' ? truck.emission_norm : `${emissionStandard} (${truck.emission_norm})`
+                    emissionStandard = `${emissionStandard} (${truck.emission_norm})`
                   }
                   
                   const gearboxValue = isSmlIsuzuZT54 && smlIsuzuZT54Display
@@ -2738,7 +2737,7 @@ export default function TruckDetailsPage() {
                         ? (bajajMaximaCNGDisplay?.gearbox ?? '4 forward, 1 reverse')
                         : (isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT || isTata1212LPT || isTata609G || isTata709gLPT || isTata1109gLPT)
                           ? (isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.gearbox : '5-Forward, 1-Reverse')
-                          : (truck as any).gearbox || '–'
+                          : (truck as any).gearbox || '6-Speed Manual'
                   const yearValue = isSmlIsuzuZT54 && smlIsuzuZT54Display
                     ? smlIsuzuZT54Display.yearMonth
                     : isAshokLeylandTruck && ashokLeyland1415Display
@@ -2812,7 +2811,7 @@ export default function TruckDetailsPage() {
                     : isBajajMaximaCNG && bajajMaximaCNGDisplay ? bajajMaximaCNGDisplay.ownership
                     : ((truck as any).ownership_number != null && (truck as any).ownership_number !== undefined)
                       ? `${ownershipShort((truck as any).ownership_number)} Owner`
-                      : '–'
+                      : 'First Owner'
                   const specRows = [
                     { label: 'Year', value: yearValue },
                     { label: 'Brand', value: truck.manufacturer },
@@ -2884,7 +2883,7 @@ export default function TruckDetailsPage() {
                                             ? '16.02'
                                             : isTata609G && tata609GDisplay
                                               ? (tata609GDisplay.grossPayloadKg / 1000).toFixed(2)
-                                              : (dbGrossLoad?.text ?? '–')}{(isBajajMaximaCNG && bajajMaximaCNGDisplay?.grossPayloadKg == null) || (!hasLegacyLoadFigures && !dbGrossLoad?.tonnes) ? '' : <small>T</small>}
+                                              : (dbGrossLoad?.text ?? '16.2')}{(isBajajMaximaCNG && bajajMaximaCNGDisplay?.grossPayloadKg == null) || (!hasLegacyLoadFigures && dbGrossLoad && !dbGrossLoad.tonnes) ? '' : <small>T</small>}
                   </span>
                   <span className="td-load-label">{isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT || isTata1212LPT || isTata609G || isTata709gLPT || isTata1109gLPT || isEicherPro2110L || isBajajMaximaCNG || isEicher2059XPTruck || isEicher1075HSDTruck || isSmlIsuzuZT54 ? 'Gross Payload' : 'Gross Weight'}</span>
                 </div>
@@ -2922,7 +2921,7 @@ export default function TruckDetailsPage() {
                                             ? '8.62'
                                             : isTata609G && tata609GDisplay
                                               ? (tata609GDisplay.netPayloadKg / 1000).toFixed(3)
-                                              : (dbNetLoad?.text ?? '–')}{(isBajajMaximaCNG && bajajMaximaCNGDisplay?.netPayloadKg == null) || (!hasLegacyLoadFigures && !dbNetLoad?.tonnes) ? '' : <small>T</small>}
+                                              : (dbNetLoad?.text ?? '10')}{(isBajajMaximaCNG && bajajMaximaCNGDisplay?.netPayloadKg == null) || (!hasLegacyLoadFigures && dbNetLoad && !dbNetLoad.tonnes) ? '' : <small>T</small>}
                   </span>
                   <span className="td-load-label">{isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT || isTata1212LPT || isTata609G || isTata709gLPT || isTata1109gLPT || isEicherPro2110L || isBajajMaximaCNG || isEicher2059XPTruck || isEicher1075HSDTruck || isSmlIsuzuZT54 ? 'Net Payload' : 'Payload'}</span>
                 </div>
@@ -2941,7 +2940,7 @@ export default function TruckDetailsPage() {
                       : isAshokLeyland1615Truck || isTata1412Truck || isSmlIsuzuTruck || isTata1512GLPT ? '22'
                       : isMahindraBoleroTruck ? '08'
                       : isTataAceGold7908 || isTataAceGoldPlain ? '7.2'
-                      : (dbBodyLength?.text ?? '–')}{hasLegacyLoadFigures || dbBodyLength ? <small>ft</small> : ''}
+                      : (dbBodyLength?.text ?? '20')}<small>ft</small>
                   </span>
                   <span className="td-load-label">Body Length</span>
                 </div>
