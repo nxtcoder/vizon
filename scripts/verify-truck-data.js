@@ -63,18 +63,24 @@ const FIELDS = [
   ['payload_capacity_ft', 'Body length (ft)', true],
   ['legal_report_url', 'Legal report', true],
   ['inspection_report_url', 'Inspection report', true],
+  // Filled by forms-API `list_draft_as_truck()` since 2026-09-21; not read by the page yet
+  ['manufactured_on', 'Registration month (MM/YYYY)', true],
+  ['emission_norm', 'Emission norm', true],
+  ['engine_capacity', 'Engine CC', true],
+  ['gallery', 'Gallery images', true],
+  ['videos', 'Videos', true],
+  ['web_report_url', 'Web report', true],
+  ['quality_scores', 'Quality report scores', true],
 ]
+
+// Columns the DB has but app/truck/[id]/page.tsx doesn't read yet
+const NOT_READ_BY_PAGE = ['manufactured_on', 'emission_norm', 'engine_capacity', 'gallery', 'videos', 'web_report_url', 'quality_scores']
 
 // Data the page shows that has NO column/table at all (always hardcoded in code today)
 const NO_DB_SOURCE = [
-  ['Registration month (e.g. 03/2022)', 'no column; page uses year only'],
-  ['Emission standard (BS-IV / BS-VI)', 'no column; parsed from subtitle or defaults to "Diesel (BS-VI)"'],
-  ['Quality report (5 sections, scores, items)', 'getInspectionData() in page.tsx — per-name or generic default'],
-  ['Features / capabilities list', 'truckCapabilities const — identical for every truck'],
+  ['Features / capabilities list', 'truckCapabilities const — identical for every truck; the form does not ask'],
   ['Highlights / advantages', 'truckHighlights / axleratorAdvantages consts — identical for every truck'],
   ['EMI interest rate', 'rateOfInterest = 10.5 hardcoded'],
-  ['Gallery images / videos', 'storage folder resolved by truck name (TRUCK_FOLDER_MAP), no media table'],
-  ['Web report PDF', 'storage folder / *-reports-mapping.json, no column'],
 ]
 
 // Placeholder the page shows when the DB value is empty (page.tsx ~2650-2800)
@@ -115,8 +121,13 @@ const HERO_OVERRIDE_HINTS = ['709g', 'zt54', '2110', 'maxima', '7908', '1512', '
 const lines = []
 const out = (s = '') => lines.push(s)
 const hr = (c = '-') => out(c.repeat(78))
-const empty = (v) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '')
-const show = (v) => (empty(v) ? '(empty)' : String(v).length > 60 ? String(v).slice(0, 57) + '...' : String(v))
+const empty = (v) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '') || (Array.isArray(v) && v.length === 0)
+const show = (v) => {
+  if (empty(v) || (Array.isArray(v) && v.length === 0)) return '(empty)'
+  if (Array.isArray(v)) return `${v.length} item(s)`
+  const str = typeof v === 'object' ? JSON.stringify(v) : String(v)
+  return str.length > 60 ? str.slice(0, 57) + '...' : str
+}
 const pad = (s, n) => String(s).padEnd(n)
 
 async function fetchJson(url) {
@@ -145,6 +156,7 @@ async function main() {
   out('  MISSING     DB value empty -> page shows a placeholder or hides the row')
   out('  HARDCODED   page ignores the DB and shows a value written in code')
   out('  NO COLUMN   the DB has no column for this at all')
+  out('  NOT READ    the DB has it, the page does not use it yet')
   out()
 
   // 1. connectivity
@@ -221,7 +233,7 @@ async function main() {
   for (const t of trucks) {
     const rules = HARDCODED_RULES.filter((r) => r.match(t))
     const hardFields = new Set(rules.flatMap((r) => r.fields.map((f) => f.split(' ')[0])))
-    const counts = { ok: 0, missing: 0, hardcoded: 0, nocol: 0 }
+    const counts = { ok: 0, missing: 0, hardcoded: 0, nocol: 0, unread: 0 }
 
     out()
     hr('=')
@@ -247,6 +259,10 @@ async function main() {
           note = PLACEHOLDERS[col] ? `page shows placeholder ${PLACEHOLDERS[col]}` : 'row hidden or blank on page'
           counts.missing++
         }
+      } else if (NOT_READ_BY_PAGE.includes(col)) {
+        status = 'NOT READ '
+        note = 'in DB, but the page does not read it yet'
+        counts.unread++
       } else {
         status = 'OK       '
         counts.ok++
@@ -257,7 +273,7 @@ async function main() {
       out(`  ${status}  ${pad(label, 38)} ${pad(show(t[col]), 30)} ${note}`)
     }
     const hasOwnInspection = rules.some((r) => r.inspection)
-    out(`  HARDCODED  ${pad('Quality report', 38)} ${hasOwnInspection ? 'per-truck values in code' : 'GENERIC default (same for all trucks)'}`)
+    out(`  HARDCODED  ${pad('Quality report (page)', 38)} ${hasOwnInspection ? 'per-truck values in code' : 'GENERIC default (same for all trucks)'}; quality_scores ignored`)
     out(`  HARDCODED  ${pad('Features / highlights', 38)} same list for every truck`)
 
     // API checks
@@ -308,17 +324,17 @@ async function main() {
   out()
   out('5. SUMMARY')
   hr('=')
-  out(`  ${pad('ID', 5)}${pad('Truck', 38)}${pad('OK', 4)}${pad('MISS', 6)}${pad('HARD', 6)}${pad('NOCOL', 7)}${apiBase ? 'Media' : ''}`)
+  out(`  ${pad('ID', 5)}${pad('Truck', 38)}${pad('OK', 4)}${pad('MISS', 6)}${pad('HARD', 6)}${pad('NOCOL', 7)}${pad('UNREAD', 8)}${apiBase ? 'Media' : ''}`)
   hr()
   for (const { t, counts, apiNote } of summary) {
-    out(`  ${pad(t.id, 5)}${pad(show(t.name).slice(0, 36), 38)}${pad(counts.ok, 4)}${pad(counts.missing, 6)}${pad(counts.hardcoded, 6)}${pad(counts.nocol, 7)}${apiNote}`)
+    out(`  ${pad(t.id, 5)}${pad(show(t.name).slice(0, 36), 38)}${pad(counts.ok, 4)}${pad(counts.missing, 6)}${pad(counts.hardcoded, 6)}${pad(counts.nocol, 7)}${pad(counts.unread, 8)}${apiNote}`)
   }
   hr()
-  const fullyDb = summary.filter((s) => !s.counts.missing && !s.counts.hardcoded && !s.counts.nocol)
+  const fullyDb = summary.filter((s) => !s.counts.missing && !s.counts.hardcoded && !s.counts.nocol && !s.counts.unread)
   out(`  Trucks fully backed by DB columns: ${fullyDb.length} / ${summary.length}`)
   out('  (Even these still use hardcoded quality report, features, EMI rate and name-resolved media.)')
   out()
-  out('  VERDICT: DB/backend provides everything only when every truck has MISS=0, HARD=0, NOCOL=0,')
+  out('  VERDICT: DB/backend provides everything only when every truck has MISS=0, HARD=0, NOCOL=0, UNREAD=0,')
   out('  and the "no DB source" items in section 2 have tables/columns and the page reads them.')
   finish()
 }
