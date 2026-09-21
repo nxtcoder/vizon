@@ -35,6 +35,15 @@ type TruckWithNumberPrice = {
   payload_capacity_ft?: string | null
   legal_report_url?: string | null
   inspection_report_url?: string | null
+  // Filled from the inspection form by forms-API `list_draft_as_truck()`
+  manufactured_on?: string | null
+  emission_norm?: string | null
+  engine_capacity?: number | null
+  gallery?: string[] | null
+  videos?: string[] | null
+  web_report_url?: string | null
+  quality_scores?: Array<{ group: string; score: number; items: Array<{ name: string; score: number }> }> | null
+  inspection_id?: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -74,7 +83,7 @@ export async function GET(
           model: result.model,
           year: result.year,
           kilometers: result.kilometers,
-          horsepower: result.horsepower,
+          horsepower: Number(result.horsepower),
           price: Number(result.price),
           imageUrl: resolveTruckListImageUrl(result),
           subtitle: result.subtitle ?? null,
@@ -96,6 +105,14 @@ export async function GET(
           payload_capacity_ft: result.payload_capacity_ft ?? null,
           legal_report_url: result.legal_report_url ?? null,
           inspection_report_url: result.inspection_report_url ?? null,
+          manufactured_on: result.manufactured_on ?? null,
+          emission_norm: result.emission_norm ?? null,
+          engine_capacity: result.engine_capacity ?? null,
+          gallery: result.gallery ?? null,
+          videos: result.videos ?? null,
+          web_report_url: result.web_report_url ?? null,
+          quality_scores: result.quality_scores ?? null,
+          inspection_id: result.inspection_id ?? null,
           createdAt: new Date(result.created_at),
           updatedAt: new Date(result.updated_at),
         }
