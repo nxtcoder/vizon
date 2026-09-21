@@ -10,6 +10,10 @@ import { publicTruckImagesRoot } from '@/lib/supabase-storage'
 
 const TRUCK_IMAGES_BASE = publicTruckImagesRoot()
 
+// Phone OTP before the full quality report. Off for now; the flow below is kept
+// so it can be switched back on.
+const REPORT_OTP_ENABLED = false
+
 const isVideoUrl = (url?: string | null) => /\.(mp4|mov|webm)(\?|$)/i.test(url || '')
 
 /**
@@ -2034,7 +2038,7 @@ export default function TruckDetailsPage() {
   }
 
   const handleViewFullReportClick = () => {
-    if (hasVerifiedReportOTP) {
+    if (!REPORT_OTP_ENABLED || hasVerifiedReportOTP) {
       setShowFullReport(true)
       return
     }
