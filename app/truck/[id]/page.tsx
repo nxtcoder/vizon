@@ -863,12 +863,23 @@ export default function TruckDetailsPage() {
                               (truckName.toLowerCase().includes('eicher') || 
                                (truck.manufacturer === 'Eicher Motors' && truck.model?.toLowerCase().includes('1075')))
       
+      // The mapping files link to the old Supabase project, which is gone; the
+      // row carries the live URL for each report.
+      const withDbReportUrls = (reports: Array<{ originalName: string; supabaseUrl: string }>) =>
+        reports.map((r) => ({
+          ...r,
+          supabaseUrl:
+            (/legal/i.test(r.originalName) ? truck.legal_report_url
+              : /inspection/i.test(r.originalName) ? truck.inspection_report_url
+              : null) || r.supabaseUrl,
+        }))
+
       if (isEicher2059XP) {
         fetch('/eicher-2059xp-reports-mapping.json')
           .then(res => res.json())
           .then(data => {
             if (Array.isArray(data) && data.length > 0) {
-              setFetchedReports(data)
+              setFetchedReports(withDbReportUrls(data))
             }
           })
           .catch(err => {
@@ -879,7 +890,7 @@ export default function TruckDetailsPage() {
           .then(res => res.json())
           .then(data => {
             if (Array.isArray(data) && data.length > 0) {
-              setFetchedReports(data)
+              setFetchedReports(withDbReportUrls(data))
             }
           })
           .catch(err => {
@@ -890,7 +901,7 @@ export default function TruckDetailsPage() {
           .then(res => res.json())
           .then(data => {
             if (Array.isArray(data) && data.length > 0) {
-              setFetchedReports(data)
+              setFetchedReports(withDbReportUrls(data))
             }
           })
           .catch(err => {
@@ -901,7 +912,7 @@ export default function TruckDetailsPage() {
           .then(res => res.json())
           .then(data => {
             if (Array.isArray(data) && data.length > 0) {
-              setFetchedReports(data)
+              setFetchedReports(withDbReportUrls(data))
             }
           })
           .catch(err => {
@@ -3102,7 +3113,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/Tata%20Ace%20Gold%20(7908)-20260307T052536Z-1-001/Tata%20Ace%20Gold%20(7908)/VEHICLE%20INSPECTION%20REPORT%20UP14HT7908.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/Tata%20Ace%20Gold%20(7908)-20260307T052536Z-1-001/Tata%20Ace%20Gold%20(7908)/VEHICLE%20INSPECTION%20REPORT%20UP14HT7908.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3155,7 +3166,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/Tata%20Ace%20Gold%20(7908)-20260307T052536Z-1-001/Tata%20Ace%20Gold%20(7908)/Copy%20of%20Legal%20Report.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/Tata%20Ace%20Gold%20(7908)-20260307T052536Z-1-001/Tata%20Ace%20Gold%20(7908)/Copy%20of%20Legal%20Report.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3217,7 +3228,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA%201512G%20LPT-20260307T052513Z-1-001/TATA%201512G%20LPT/Copy%20of%20Inspection%20Report.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA%201512G%20LPT-20260307T052513Z-1-001/TATA%201512G%20LPT/Copy%20of%20Inspection%20Report.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3270,7 +3281,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA%201512G%20LPT-20260307T052513Z-1-001/TATA%201512G%20LPT/Copy%20of%20Legal%20Report%20DL1GE0184.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA%201512G%20LPT-20260307T052513Z-1-001/TATA%201512G%20LPT/Copy%20of%20Legal%20Report%20DL1GE0184.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3332,7 +3343,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1615_HE/REPORTS/1771053006348-VEHICLE%20INSPECTION%20REPORT%20UP14LT9003.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1615_HE/REPORTS/1771053006348-VEHICLE%20INSPECTION%20REPORT%20UP14LT9003.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3385,7 +3396,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1615_HE/REPORTS/1771053005474-Copy%20of%20Legal%20Report%20UP14LT9003.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1615_HE/REPORTS/1771053005474-Copy%20of%20Legal%20Report%20UP14LT9003.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3447,7 +3458,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1415_HE/REPORTS/VEHICLE%20INSPECTION%20REPORT%20UP14LT8731.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1415_HE/REPORTS/VEHICLE%20INSPECTION%20REPORT%20UP14LT8731.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3500,7 +3511,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1415_HE/REPORTS/Copy%20of%20Legal%20Report%20UP14LT8731.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/ASHOK_LEYLAND_ECOMET_STAR_1415_HE/REPORTS/Copy%20of%20Legal%20Report%20UP14LT8731.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3562,7 +3573,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/MAHINDRA_BOLERO_MAXITRUCK_PLUS/REPORTS/1771078437401-Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20DL1LAH4925.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/MAHINDRA_BOLERO_MAXITRUCK_PLUS/REPORTS/1771078437401-Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20DL1LAH4925.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3615,7 +3626,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/MAHINDRA_BOLERO_MAXITRUCK_PLUS/REPORTS/1771078436322-Copy%20of%20Legal%20Report%20DL1LAH4925.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/MAHINDRA_BOLERO_MAXITRUCK_PLUS/REPORTS/1771078436322-Copy%20of%20Legal%20Report%20DL1LAH4925.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3677,7 +3688,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML_ISUZU_SAMRAT_4760GS/REPORTS/1771078661337-Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20DL1MA9541.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML_ISUZU_SAMRAT_4760GS/REPORTS/1771078661337-Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20DL1MA9541.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3730,7 +3741,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML_ISUZU_SAMRAT_4760GS/REPORTS/1771078660290-Copy%20of%20Legal%20Report%20DL1MA9541.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML_ISUZU_SAMRAT_4760GS/REPORTS/1771078660290-Copy%20of%20Legal%20Report%20DL1MA9541.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3792,7 +3803,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML%20Isuzu%20ZT54%20-20260310T094926Z-1-001/SML%20Isuzu%20ZT54/Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20UP14GT0868.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML%20Isuzu%20ZT54%20-20260310T094926Z-1-001/SML%20Isuzu%20ZT54/Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20UP14GT0868.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3845,7 +3856,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML%20Isuzu%20ZT54%20-20260310T094926Z-1-001/SML%20Isuzu%20ZT54/Copy%20of%20Legal%20Report%20UP14GT0868.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/SML%20Isuzu%20ZT54%20-20260310T094926Z-1-001/SML%20Isuzu%20ZT54/Copy%20of%20Legal%20Report%20UP14GT0868.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3907,7 +3918,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1412_LPT/REPORTS/1771078913445-Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20HR69E1703.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1412_LPT/REPORTS/1771078913445-Copy%20of%20VEHICLE%20INSPECTION%20REPORT%20HR69E1703.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -3960,7 +3971,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1412_LPT/REPORTS/1771078912338-Copy%20of%20Legal%20Report%20HR69E1703.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1412_LPT/REPORTS/1771078912338-Copy%20of%20Legal%20Report%20HR69E1703.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -4105,7 +4116,7 @@ export default function TruckDetailsPage() {
                   <h3 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1rem', color: '#111827' }}>Quality Reports & Documents</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1109G_LPT/REPORTS/1771271315383-VEHICLE%20INSPECTION%20REPORT%20HR55AP0795.pdf"
+                      href={truck.inspection_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1109G_LPT/REPORTS/1771271315383-VEHICLE%20INSPECTION%20REPORT%20HR55AP0795.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
@@ -4158,7 +4169,7 @@ export default function TruckDetailsPage() {
                       </svg>
                     </a>
                     <a
-                      href="https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1109G_LPT/REPORTS/1771271314357-Legal%20Report%20HR55AP0795.pdf"
+                      href={truck.legal_report_url || 'https://ccmlkidiwxmqxzexoeji.supabase.co/storage/v1/object/public/truck-images/TATA_1109G_LPT/REPORTS/1771271314357-Legal%20Report%20HR55AP0795.pdf'}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
