@@ -16,6 +16,8 @@
  *     is replaced, since the column only became numeric on 2026-09-21
  *   - a field the report doesn't have stays empty and is listed as missing
  *   - trucks named by their plate (HR 38 W 2162 …) get registration_number from the name
+ *   - the emission norm comes from the Legal Report beside the web report
+ *     ("Emission Norms – Bharat Stage VI"); one of them is a Word file named .pdf
  *
  * Needs pdftotext (poppler-utils).
  */
@@ -90,6 +92,26 @@ function date(s) {
   return `${year}-${mo.padStart(2, '0')}-${d.padStart(2, '0')}`
 }
 
+/** Text of a report that may really be a .docx saved with a .pdf name. */
+function reportText(file) {
+  const head = fs.readFileSync(file).subarray(0, 4).toString('latin1')
+  if (head.startsWith('PK')) {
+    const xml = execFileSync('unzip', ['-p', file, 'word/document.xml'], { encoding: 'utf8' })
+    return xml.replace(/<\/w:p>/g, '\n').replace(/<[^>]+>/g, '')
+  }
+  return execFileSync('pdftotext', [file, '-'], { encoding: 'utf8' })
+}
+
+/** "Emission Norms – Bharat Stage VI" -> "BS-VI" */
+function emissionFromLegal(webReport) {
+  const dir = path.dirname(webReport)
+  const legal = fs.readdirSync(dir).find((f) => /legal\s*report/i.test(f))
+  if (!legal) return null
+  const m = reportText(path.join(dir, legal)).replace(/\s+/g, ' ')
+    .match(/Emission Norms?\s*[–:-]\s*(?:Bharat Stage|BS)[\s-]*(VI|IV|III|II|6|4|3)\b/i)
+  return m ? 'BS-' + ({ 6: 'VI', 4: 'IV', 3: 'III' }[m[1]] || m[1].toUpperCase()) : null
+}
+
 function parseReport(file) {
   const text = execFileSync('pdftotext', [file, '-'], { encoding: 'utf8' })
   const kv = pairs(text)
@@ -139,6 +161,7 @@ function parseReport(file) {
     else if (scores.length) scores[scores.length - 1].items.push({ name: label, score: num(v) })
   }
   r.quality_scores = scores.length === 5 ? scores : null
+  if (!r.emission_norm) r.emission_norm = emissionFromLegal(file)
   return r
 }
 
@@ -146,7 +169,8 @@ async function main() {
   const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
   })
-  const { data: trucks, error } = await supabase.from('trucks').select('*').is('inspection_id', null).order('id')
+  // Uncertified rows are not touched
+  const { data: trucks, error } = await supabase.from('trucks').select('*').is('inspection_id', null).eq('certified', true).order('id')
   if (error) throw error
 
   const byPlate = new Map(trucks.filter((t) => t.registration_number).map((t) => [plateKey(t.registration_number), t]))
