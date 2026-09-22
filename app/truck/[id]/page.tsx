@@ -647,6 +647,43 @@ const getInspectionData = (truckName: string | null | undefined) => {
   }
 }
 
+type QualityGroup = { group: string; score: number; items: Array<{ name: string; score: number }> }
+
+const groupStatus = (n: number) => (n >= 9 ? 'Excellent' : n >= 8 ? 'Very Good' : n >= 7 ? 'Good' : n >= 6 ? 'Fair' : 'Needs Attention')
+const itemStatus = (n: number) =>
+  n >= 9 ? 'Excellent condition' : n >= 8 ? 'Good condition' : n >= 6 ? 'Functional, some wear' : 'Needs attention'
+
+/**
+ * The quality report from `trucks.quality_scores` (the web report's five groups),
+ * in the shape getInspectionData returns. Parts and assemblies have no DB source,
+ * so they keep the default report's figures. Null when the row has no scores.
+ */
+const inspectionDataFromScores = (groups: unknown) => {
+  if (!Array.isArray(groups) || groups.length === 0) return null
+  const defaults = getInspectionData(null) as Record<string, { label: string; parts: number; assemblies: number }>
+  const keyFor: Record<string, string> = {
+    'Core Systems': 'coreSystems',
+    'Loading Systems': 'loadingSystems',
+    'Cabin & Interiors': 'cabinInteriors',
+    'Exterior & Body': 'exteriorBody',
+    'Safety & Brakes': 'safetyBrakes',
+  }
+  const data: Record<string, { score: number; label: string; parts: number; assemblies: number; status: string; items: Array<{ name: string; score: number; status: string; passed: boolean }> }> = {}
+  for (const g of groups as QualityGroup[]) {
+    const key = keyFor[g?.group]
+    if (!key || typeof g.score !== 'number') return null
+    data[key] = {
+      score: g.score,
+      label: g.group,
+      parts: defaults[key]?.parts ?? 0,
+      assemblies: (g.items ?? []).length,
+      status: groupStatus(g.score),
+      items: (g.items ?? []).map((item) => ({ name: item.name, score: item.score, status: itemStatus(item.score), passed: item.score >= 5 })),
+    }
+  }
+  return data
+}
+
 // Truck Highlights
 const truckHighlights = [
   { icon: 'power', label: 'Power Steering', desc: 'Easy maneuvering' },
@@ -819,9 +856,16 @@ export default function TruckDetailsPage() {
       )
       loadSimilarTrucks()
       
-      // Fetch images from API for ALL trucks
-      const truckName = truck.name || ''
-      
+      // The truck's own photos and videos, written to `trucks` by the forms
+      // pipeline and the backfill, come first. The folder lookup by name is the
+      // fallback, and gives some trucks another truck's photos.
+      const dbMedia = [
+        ...(Array.isArray(truck.gallery) ? truck.gallery : []),
+        ...(Array.isArray(truck.videos) ? truck.videos : []),
+      ].filter((url: unknown): url is string => typeof url === 'string' && url.length > 0)
+      const truckName = dbMedia.length > 0 ? '' : truck.name || ''
+      if (dbMedia.length > 0) setFetchedImages(dbMedia)
+
       if (truckName) {
         // Pass the truck's own hero image / registration number so the API can find
         // gallery folders that are named by registration number instead of truck name.
@@ -2108,7 +2152,7 @@ export default function TruckDetailsPage() {
     isAshokLeylandTruck || isAshokLeyland1615Truck || isTata1412Truck || isSmlIsuzuTruck ||
     isMahindraBoleroTruck || isTataAceGold7908 || isTataAceGoldPlain || isTata1512GLPT
   )
-  const inspectionData = getInspectionData(truck?.name)
+  const inspectionData = inspectionDataFromScores(truck?.quality_scores) ?? getInspectionData(truck?.name)
   const overallScore = (Object.values(inspectionData).reduce((acc, cat) => acc + cat.score, 0) / Object.keys(inspectionData).length).toFixed(1)
 
   return (
@@ -2705,7 +2749,7 @@ export default function TruckDetailsPage() {
                     : isTata1109gLPT && tata1109gLPTDisplay ? tata1109gLPTDisplay.yearMonth
                     : isEicherPro2110L && eicherPro2110LDisplay ? eicherPro2110LDisplay.yearMonth
                     : isBajajMaximaCNG && bajajMaximaCNGDisplay ? bajajMaximaCNGDisplay.yearMonth
-                    : truck.year
+                    : truck.manufactured_on || truck.year
                   const odometerValue = isSmlIsuzuZT54 && smlIsuzuZT54Display
                     ? `${smlIsuzuZT54Display.kms.toLocaleString('en-IN')} km`
                     : isAshokLeylandTruck && ashokLeyland1415Display
@@ -2723,7 +2767,7 @@ export default function TruckDetailsPage() {
                     : isTata1109gLPT && tata1109gLPTDisplay ? `${tata1109gLPTDisplay.kms.toLocaleString('en-IN')} km`
                     : isEicherPro2110L && eicherPro2110LDisplay ? `${eicherPro2110LDisplay.kms.toLocaleString('en-IN')} km`
                     : isBajajMaximaCNG && bajajMaximaCNGDisplay ? `${bajajMaximaCNGDisplay.kms.toLocaleString('en-IN')} km`
-                    : `${truck.kilometers?.toLocaleString() || '0'} km`
+                    : `${truck.kilometers?.toLocaleString('en-IN') || '0'} km`
                   const powerValue = isSmlIsuzuZT54 && smlIsuzuZT54Display
                     ? smlIsuzuZT54Display.powerDisplay
                     : isAshokLeylandTruck && ashokLeyland1415Display
@@ -2769,6 +2813,7 @@ export default function TruckDetailsPage() {
                     { label: 'Fuel', value: emissionStandard },
                     { label: 'Odometer', value: odometerValue },
                     { label: 'Power', value: powerValue },
+                    ...(truck.engine_capacity && !(isSmlIsuzuZT54 && smlIsuzuZT54Display) ? [{ label: 'Engine', value: `${Number(truck.engine_capacity).toLocaleString('en-IN')} cc` }] : []),
                     { label: 'Gearbox', value: gearboxValue },
                     { label: 'RTO', value: rtoValue },
                     { label: 'Insurance', value: insuranceValue },
