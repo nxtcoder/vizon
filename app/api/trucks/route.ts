@@ -13,6 +13,12 @@ import { resolveTruckListImageUrl } from '@/lib/truck-listing-images'
 
 export const dynamic = 'force-dynamic'
 
+/** RTO code from the plate, zero-padded the way RTO lists write it: "DL1LAE3215" -> "DL-01". */
+const rtoCodeFromPlate = (plate?: string | null) => {
+  const m = (plate || '').toUpperCase().replace(/[^A-Z0-9]/g, '').match(/^([A-Z]{2})(\d{1,2})/)
+  return m ? `${m[1]}-${m[2].padStart(2, '0')}` : null
+}
+
 type TruckWithNumberPrice = {
   id: number
   name: string
@@ -31,6 +37,8 @@ type TruckWithNumberPrice = {
   rto: string | null
   fuel_type: string | null
   transmission: string | null
+  rto_code: string | null
+  ownership_number: number | null
   createdAt: Date
   updatedAt: Date
 }
@@ -94,6 +102,8 @@ export async function GET(request: Request) {
           rto: truck.rto ?? null,
           fuel_type: truck.fuel_type ?? null,
           transmission: truck.transmission ?? null,
+          rto_code: rtoCodeFromPlate(truck.registration_number),
+          ownership_number: truck.ownership_number ?? null,
           createdAt: new Date(truck.created_at),
           updatedAt: new Date(truck.updated_at),
         }))
@@ -120,6 +130,8 @@ export async function GET(request: Request) {
           rto: null,
           fuel_type: null,
           transmission: null,
+          rto_code: null,
+          ownership_number: null,
         })) as TruckWithNumberPrice[]
         return {
           trucks: paginatedTrucks,
@@ -210,6 +222,8 @@ export async function POST(request: Request) {
           rto: result.rto ?? null,
           fuel_type: result.fuel_type ?? null,
           transmission: result.transmission ?? null,
+          rto_code: rtoCodeFromPlate(result.registration_number),
+          ownership_number: result.ownership_number ?? null,
           createdAt: new Date(result.created_at),
           updatedAt: new Date(result.updated_at),
         }

@@ -49,6 +49,8 @@ export interface Truck {
   rto?: string | null
   fuel_type?: string | null
   transmission?: string | null
+  registration_number?: string | null
+  ownership_number?: number | null
   created_at: string
   updated_at: string
 }
