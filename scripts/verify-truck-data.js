@@ -63,7 +63,7 @@ const FIELDS = [
   ['payload_capacity_ft', 'Body length (ft)', true],
   ['legal_report_url', 'Legal report', true],
   ['inspection_report_url', 'Inspection report', true],
-  // Filled by forms-API `list_draft_as_truck()` since 2026-09-21; not read by the page yet
+  // Filled by forms-API `list_draft_as_truck()` since 2026-09-21; read by the page since 2026-09-22
   ['manufactured_on', 'Registration month (MM/YYYY)', true],
   ['emission_norm', 'Emission norm', true],
   ['engine_capacity', 'Engine CC', true],
@@ -74,7 +74,7 @@ const FIELDS = [
 
 // Columns the DB has but app/truck/[id]/page.tsx doesn't read yet
 // The site links only the legal and inspection reports; web_report_url isn't needed
-const NOT_READ_BY_PAGE = ['manufactured_on', 'engine_capacity', 'gallery', 'videos', 'quality_scores']
+const NOT_READ_BY_PAGE = []
 
 // Data the page shows that has NO column/table at all (always hardcoded in code today)
 const NO_DB_SOURCE = [
@@ -273,7 +273,11 @@ async function main() {
       out(`  ${status}  ${pad(label, 38)} ${pad(show(t[col]), 30)} ${note}`)
     }
     const hasOwnInspection = rules.some((r) => r.inspection)
-    out(`  HARDCODED  ${pad('Quality report (page)', 38)} ${hasOwnInspection ? 'per-truck values in code' : 'GENERIC default (same for all trucks)'}; quality_scores ignored`)
+    if (empty(t.quality_scores)) {
+      out(`  HARDCODED  ${pad('Quality report (page)', 38)} ${hasOwnInspection ? 'per-truck values in code' : 'GENERIC default (same for all trucks)'}; no quality_scores`)
+    } else {
+      out(`  OK         ${pad('Quality report (page)', 38)} from quality_scores; parts counts are the default report's`)
+    }
     out(`  HARDCODED  ${pad('Features / highlights', 38)} same list for every truck`)
 
     // API checks
