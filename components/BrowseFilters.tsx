@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react'
 
 interface BrowseFiltersProps {
   onFilterChange: (filters: any) => void
@@ -43,11 +43,11 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
   const [priceMin, setPriceMin] = useState(50000)
   const [priceMax, setPriceMax] = useState(7000000)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
-  const [selectedYear, setSelectedYear] = useState('')
-  const [selectedKmDriven, setSelectedKmDriven] = useState('')
+  const [selectedYears, setSelectedYears] = useState<string[]>([])
+  const [selectedKmRanges, setSelectedKmRanges] = useState<string[]>([])
   const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([])
-  const [selectedOwner, setSelectedOwner] = useState('')
-  const [selectedState, setSelectedState] = useState('')
+  const [selectedOwners, setSelectedOwners] = useState<string[]>([])
+  const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [stateSearchQuery, setStateSearchQuery] = useState('')
 
   // Auto-apply filters whenever any filter value changes
@@ -56,48 +56,46 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       priceMin,
       priceMax,
       selectedBrands,
-      selectedYear,
-      selectedKmDriven,
+      selectedYears,
+      selectedKmRanges,
       selectedFuelTypes,
-      selectedOwner,
-      selectedState
+      selectedOwners,
+      selectedStates
     })
-  }, [priceMin, priceMax, selectedBrands, selectedYear, selectedKmDriven, 
-      selectedFuelTypes, selectedOwner, selectedState, onFilterChange])
+  }, [priceMin, priceMax, selectedBrands, selectedYears, selectedKmRanges, 
+      selectedFuelTypes, selectedOwners, selectedStates, onFilterChange])
 
   const handleReset = () => {
     setPriceMin(50000)
     setPriceMax(7000000)
     setSelectedBrands([])
-    setSelectedYear('')
-    setSelectedKmDriven('')
+    setSelectedYears([])
+    setSelectedKmRanges([])
     setSelectedFuelTypes([])
-    setSelectedOwner('')
-    setSelectedState('')
+    setSelectedOwners([])
+    setSelectedStates([])
     setStateSearchQuery('')
     onFilterChange({
       priceMin: 50000,
       priceMax: 7000000,
       selectedBrands: [],
-      selectedYear: '',
-      selectedKmDriven: '',
+      selectedYears: [],
+      selectedKmRanges: [],
       selectedFuelTypes: [],
-      selectedOwner: '',
-      selectedState: ''
+      selectedOwners: [],
+      selectedStates: []
     })
   }
 
-  const toggleBrand = (brand: string) => {
-    setSelectedBrands(prev => 
-      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
-    )
-  }
-
-  const toggleFuelType = (fuel: string) => {
-    setSelectedFuelTypes(prev => 
-      prev.includes(fuel) ? prev.filter(f => f !== fuel) : [...prev, fuel]
-    )
-  }
+  /** Adds the value to a multi-choice filter, or removes it if already ticked. */
+  const toggle = (setter: Dispatch<SetStateAction<string[]>>) => (value: string) =>
+    setter(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
+  const toggleBrand = toggle(setSelectedBrands)
+  const toggleYear = toggle(setSelectedYears)
+  const toggleKmRange = toggle(setSelectedKmRanges)
+  const toggleFuelType = toggle(setSelectedFuelTypes)
+  const toggleOwner = toggle(setSelectedOwners)
+  const toggleState = toggle(setSelectedStates)
 
   return (
     <div className="browse-filters">
@@ -223,20 +221,11 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
           <div className="filter-section-content">
             <div className="filter-checkboxes">
               {[`2021 - ${new Date().getFullYear()}`, '2018 - 2020', '2015 - 2017', '2012 - 2014', '2009 - 2011', 'Before 2009'].map(year => (
-                <label 
-                  key={year} 
-                  className="filter-checkbox"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setSelectedYear(selectedYear === year ? '' : year)
-                  }}
-                >
+                <label key={year} className="filter-checkbox">
                   <input 
-                    type="radio" 
-                    name="year"
-                    checked={selectedYear === year}
-                    onChange={() => {}}
-                    readOnly
+                    type="checkbox" 
+                    checked={selectedYears.includes(year)}
+                    onChange={() => toggleYear(year)}
                   />
                   <span>{year}</span>
                 </label>
@@ -263,20 +252,11 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
           <div className="filter-section-content">
             <div className="filter-checkboxes">
               {['Less than 10,000 km', '10,000 - 25,000 km', '25,000 - 50,000 km', '50,000 - 75,000 km', '75,000 - 1,00,000 km', '1,00,000 - 1,50,000 km', '1,50,000 - 2,00,000 km', 'More than 2,00,000 km'].map(km => (
-                <label 
-                  key={km} 
-                  className="filter-checkbox"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setSelectedKmDriven(selectedKmDriven === km ? '' : km)
-                  }}
-                >
+                <label key={km} className="filter-checkbox">
                   <input 
-                    type="radio" 
-                    name="kmDriven"
-                    checked={selectedKmDriven === km}
-                    onChange={() => {}}
-                    readOnly
+                    type="checkbox" 
+                    checked={selectedKmRanges.includes(km)}
+                    onChange={() => toggleKmRange(km)}
                   />
                   <span>{km}</span>
                 </label>
@@ -334,20 +314,11 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
           <div className="filter-section-content">
             <div className="filter-checkboxes">
               {['1st Owner', '2nd Owner', '3rd Owner', '4th Owner', '5+ Owner'].map(owner => (
-                <label 
-                  key={owner} 
-                  className="filter-checkbox"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setSelectedOwner(selectedOwner === owner ? '' : owner)
-                  }}
-                >
+                <label key={owner} className="filter-checkbox">
                   <input 
-                    type="radio" 
-                    name="owner"
-                    checked={selectedOwner === owner}
-                    onChange={() => {}}
-                    readOnly
+                    type="checkbox" 
+                    checked={selectedOwners.includes(owner)}
+                    onChange={() => toggleOwner(owner)}
                   />
                   <span>{owner}</span>
                 </label>
@@ -386,20 +357,11 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
                 state.toLowerCase().includes(stateSearchQuery.toLowerCase())
               )
               .map(state => (
-                <label 
-                  key={state} 
-                  className="filter-checkbox"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setSelectedState(selectedState === state ? '' : state)
-                  }}
-                >
+                <label key={state} className="filter-checkbox">
                   <input 
-                    type="radio" 
-                    name="state"
-                    checked={selectedState === state}
-                    onChange={() => {}}
-                    readOnly
+                    type="checkbox" 
+                    checked={selectedStates.includes(state)}
+                    onChange={() => toggleState(state)}
                   />
                   <span>{state}</span>
                 </label>
