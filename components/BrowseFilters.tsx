@@ -126,6 +126,25 @@ const RTO_LOCATIONS = [
 /** "DL-01" -> "Delhi (DL-01)"; a code with no known city is shown as the code. */
 export const rtoLabel = (code: string) => RTO_LOCATIONS.find((l) => l.endsWith(`(${code})`)) || code
 
+/** Slider stops: 50K, then 1L steps to 15L, 5L to 20L, 10L to 70L. */
+const PRICE_STEPS = [
+  50000,
+  ...Array.from({ length: 15 }, (_, i) => (i + 1) * 100000),
+  2000000,
+  ...Array.from({ length: 5 }, (_, i) => (i + 3) * 1000000),
+]
+const PRICE_FLOOR = PRICE_STEPS[0]
+const PRICE_CEIL = PRICE_STEPS[PRICE_STEPS.length - 1]
+
+/** Index of the last stop at or below the price, so a typed price still places the thumb. */
+const priceStepIndex = (price: number) => {
+  let i = 0
+  while (i < PRICE_STEPS.length - 1 && PRICE_STEPS[i + 1] <= price) i++
+  return i
+}
+
+const clampPrice = (price: number) => Math.min(PRICE_CEIL, Math.max(PRICE_FLOOR, price))
+
 export default function BrowseFilters({ onFilterChange, totalCars, onClose, brands, rtoCodes }: BrowseFiltersProps) {
   const [isPriceRangeOpen, setIsPriceRangeOpen] = useState(true)
   const [isBrandOpen, setIsBrandOpen] = useState(false)
@@ -228,16 +247,20 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
                 <label>Minimum:</label>
                 <input 
                   type="text" 
-                  value={`₹ ${priceMin.toLocaleString()}`}
+                  inputMode="numeric"
+                  value={`₹ ${priceMin.toLocaleString('en-IN')}`}
                   onChange={(e) => setPriceMin(parseInt(e.target.value.replace(/\D/g, '')) || 0)}
+                  onBlur={() => setPriceMin(Math.min(clampPrice(priceMin), priceMax))}
                 />
               </div>
               <div className="price-input-group">
                 <label>Maximum:</label>
                 <input 
                   type="text" 
-                  value={`₹ ${priceMax.toLocaleString()}`}
+                  inputMode="numeric"
+                  value={`₹ ${priceMax.toLocaleString('en-IN')}`}
                   onChange={(e) => setPriceMax(parseInt(e.target.value.replace(/\D/g, '')) || 0)}
+                  onBlur={() => setPriceMax(Math.max(clampPrice(priceMax), priceMin))}
                 />
               </div>
             </div>
@@ -245,18 +268,20 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
             <div className="price-range-slider">
               <input 
                 type="range" 
-                min="0" 
-                max="10000000" 
-                value={priceMin}
-                onChange={(e) => setPriceMin(parseInt(e.target.value))}
+                min={0} 
+                max={PRICE_STEPS.length - 1} 
+                step={1}
+                value={priceStepIndex(priceMin)}
+                onChange={(e) => setPriceMin(PRICE_STEPS[Math.min(parseInt(e.target.value), priceStepIndex(priceMax))])}
                 className="range-input range-min"
               />
               <input 
                 type="range" 
-                min="0" 
-                max="10000000" 
-                value={priceMax}
-                onChange={(e) => setPriceMax(parseInt(e.target.value))}
+                min={0} 
+                max={PRICE_STEPS.length - 1} 
+                step={1}
+                value={priceStepIndex(priceMax)}
+                onChange={(e) => setPriceMax(PRICE_STEPS[Math.max(parseInt(e.target.value), priceStepIndex(priceMin))])}
                 className="range-input range-max"
               />
             </div>
