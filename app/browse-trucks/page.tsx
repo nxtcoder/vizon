@@ -75,13 +75,13 @@ const DEFAULT_FILTERS = {
   priceMin: 50000,
   priceMax: 7000000,
   selectedBrands: [] as string[],
-  selectedYear: '',
-  selectedKmDriven: '',
+  selectedYears: [] as string[],
+  selectedKmRanges: [] as string[],
   selectedFuelTypes: [] as string[],
-  selectedOwner: '',
+  selectedOwners: [] as string[],
   transmission: '',
   location: '',
-  selectedState: '',
+  selectedStates: [] as string[],
   searchQuery: ''
 }
 
@@ -283,61 +283,26 @@ function BrowseTrucksContent() {
       console.log('After brand filter:', filtered.length)
     }
 
-    // Year filter - range-based format
-    if (filters.selectedYear) {
-      const yearRange = filters.selectedYear
-      let minYear = 0
-      let maxYear = new Date().getFullYear()
-      
-      // Parse the range from the selected option
-      if (yearRange === 'Before 2009') {
-        minYear = 0
-        maxYear = 2008
-      } else {
-        // Parse range format like "2021 - 2024"
-        const rangeMatch = yearRange.match(/(\d{4})\s*-\s*(\d{4})/)
-        if (rangeMatch) {
-          minYear = parseInt(rangeMatch[1])
-          maxYear = parseInt(rangeMatch[2])
-        }
-      }
-      
-      console.log('Year Filter active! Range:', minYear, '-', maxYear)
-      filtered = filtered.filter(truck => {
-        const passes = truck.year >= minYear && truck.year <= maxYear
-        return passes
-      })
+    // Year filter - any of the ticked ranges
+    if (filters.selectedYears.length > 0) {
+      filtered = filtered.filter(truck => filters.selectedYears.some(range => {
+        if (range === 'Before 2009') return truck.year <= 2008
+        const m = range.match(/(\d{4})\s*-\s*(\d{4})/)
+        return !!m && truck.year >= parseInt(m[1]) && truck.year <= parseInt(m[2])
+      }))
       console.log('After year filter:', filtered.length)
     }
 
-    // KM Driven filter - range-based format
-    if (filters.selectedKmDriven) {
-      const kmRange = filters.selectedKmDriven
-      let minKm = 0
-      let maxKm = Infinity
-      
-      // Parse the range from the selected option
-      if (kmRange === 'Less than 10,000 km') {
-        minKm = 0
-        maxKm = 9999
-      } else if (kmRange === 'More than 2,00,000 km') {
-        minKm = 200000
-        maxKm = Infinity
-      } else {
-        // Parse range format like "10,000 - 25,000 km"
-        const rangeMatch = kmRange.match(/(\d{1,3}(?:,\d{2,3})*)\s*-\s*(\d{1,3}(?:,\d{2,3})*)/)
-        if (rangeMatch) {
-          minKm = parseInt(rangeMatch[1].replace(/,/g, ''))
-          maxKm = parseInt(rangeMatch[2].replace(/,/g, ''))
-        }
-      }
-      
-      console.log('KM Filter active! Range:', minKm, '-', maxKm === Infinity ? '∞' : maxKm)
+    // KM Driven filter - any of the ticked ranges
+    if (filters.selectedKmRanges.length > 0) {
       filtered = filtered.filter(truck => {
         const km = parseInt(truck.mileage.replace(/[^0-9]/g, ''))
-        const passes = km >= minKm && km <= maxKm
-        console.log(`  ${truck.name}: ${km} km ${passes ? 'PASS' : 'FAIL'}`)
-        return passes
+        return filters.selectedKmRanges.some(range => {
+          if (range === 'Less than 10,000 km') return km <= 9999
+          if (range === 'More than 2,00,000 km') return km >= 200000
+          const m = range.match(/(\d{1,3}(?:,\d{2,3})*)\s*-\s*(\d{1,3}(?:,\d{2,3})*)/)
+          return !!m && km >= parseInt(m[1].replace(/,/g, '')) && km <= parseInt(m[2].replace(/,/g, ''))
+        })
       })
       console.log('After KM filter:', filtered.length)
     }
@@ -350,13 +315,14 @@ function BrowseTrucksContent() {
       console.log('After fuel type filter:', filtered.length)
     }
 
-    // Owner filter
-    if (filters.selectedOwner) {
-      // "5+ Owner" is 5 or more; the rest name one count ("2nd Owner")
-      const wanted = parseInt(filters.selectedOwner)
+    // Owner filter - "5+ Owner" is 5 or more; the rest name one count ("2nd Owner")
+    if (filters.selectedOwners.length > 0) {
       filtered = filtered.filter(truck => {
         if (!truck.ownerNumber) return false
-        return filters.selectedOwner.includes('+') ? truck.ownerNumber >= wanted : truck.ownerNumber === wanted
+        return filters.selectedOwners.some(owner => {
+          const wanted = parseInt(owner)
+          return owner.includes('+') ? truck.ownerNumber! >= wanted : truck.ownerNumber === wanted
+        })
       })
       console.log('After owner filter:', filtered.length)
     }
@@ -395,8 +361,8 @@ function BrowseTrucksContent() {
     }
 
     // State filter - the state the truck's plate was registered in
-    if (filters.selectedState) {
-      filtered = filtered.filter(truck => truck.rtoState === filters.selectedState)
+    if (filters.selectedStates.length > 0) {
+      filtered = filtered.filter(truck => !!truck.rtoState && filters.selectedStates.includes(truck.rtoState))
       console.log('After state filter:', filtered.length)
     }
 
