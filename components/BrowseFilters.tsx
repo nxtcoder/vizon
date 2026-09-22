@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, type Dispatch, type SetStateAction } from 'react'
+import { useState, useEffect, useCallback, type Dispatch, type MouseEvent, type SetStateAction } from 'react'
 
 interface BrowseFiltersProps {
   onFilterChange: (filters: any) => void
@@ -87,6 +87,15 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
     })
   }
 
+  /**
+   * The sidebar scrolls on its own, so a section opened near its bottom (State,
+   * Owner) would unfold out of sight. Bring the whole section into view.
+   */
+  const revealSection = (e: MouseEvent<HTMLElement>) => {
+    const section = e.currentTarget.closest('.filter-section')
+    requestAnimationFrame(() => section?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }))
+  }
+
   /** Adds the value to a multi-choice filter, or removes it if already ticked. */
   const toggle = (setter: Dispatch<SetStateAction<string[]>>) => (value: string) =>
     setter(prev => prev.includes(value) ? prev.filter(v => v !== value) : [...prev, value])
@@ -114,7 +123,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsPriceRangeOpen(!isPriceRangeOpen)}
+          onClick={(e) => { if (!isPriceRangeOpen) revealSection(e); setIsPriceRangeOpen(!isPriceRangeOpen) }}
         >
           <span className="filter-section-title">
             Price Range
@@ -176,7 +185,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsBrandOpen(!isBrandOpen)}
+          onClick={(e) => { if (!isBrandOpen) revealSection(e); setIsBrandOpen(!isBrandOpen) }}
         >
           <span className="filter-section-title">
             Brand
@@ -208,7 +217,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsYearOpen(!isYearOpen)}
+          onClick={(e) => { if (!isYearOpen) revealSection(e); setIsYearOpen(!isYearOpen) }}
         >
           <span className="filter-section-title">
             Year
@@ -239,7 +248,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsKmDrivenOpen(!isKmDrivenOpen)}
+          onClick={(e) => { if (!isKmDrivenOpen) revealSection(e); setIsKmDrivenOpen(!isKmDrivenOpen) }}
         >
           <span className="filter-section-title">
             KM Driven
@@ -270,7 +279,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsFuelTypeOpen(!isFuelTypeOpen)}
+          onClick={(e) => { if (!isFuelTypeOpen) revealSection(e); setIsFuelTypeOpen(!isFuelTypeOpen) }}
         >
           <span className="filter-section-title">
             Fuel Type
@@ -301,7 +310,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsOwnerOpen(!isOwnerOpen)}
+          onClick={(e) => { if (!isOwnerOpen) revealSection(e); setIsOwnerOpen(!isOwnerOpen) }}
         >
           <span className="filter-section-title">
             Owner
@@ -332,7 +341,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       <div className="filter-section">
         <button 
           className="filter-section-header"
-          onClick={() => setIsStateOpen(!isStateOpen)}
+          onClick={(e) => { if (!isStateOpen) revealSection(e); setIsStateOpen(!isStateOpen) }}
         >
           <span className="filter-section-title">
             State
@@ -350,7 +359,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
               value={stateSearchQuery}
               onChange={(e) => setStateSearchQuery(e.target.value)}
             />
-            <div className="filter-checkboxes" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <div className="filter-checkboxes">
               {states
               .filter(state => 
                 stateSearchQuery === '' || 
