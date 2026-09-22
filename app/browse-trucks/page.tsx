@@ -489,6 +489,8 @@ function BrowseTrucksContent() {
             onFilterChange={handleFilterChange}
             totalCars={filteredTrucks.length}
             onClose={() => setShowFilters(false)}
+            hasActiveFilters={isAnyFilterApplied()}
+            onClear={clearAllFilters}
           />
         </aside>
 
