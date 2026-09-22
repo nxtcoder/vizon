@@ -6,6 +6,10 @@ interface BrowseFiltersProps {
   onFilterChange: (filters: any) => void
   totalCars: number
   onClose?: () => void
+  /** Whether any filter differs from its default; the desktop X shows only then. */
+  hasActiveFilters?: boolean
+  /** Clears every filter (the desktop X). */
+  onClear?: () => void
   /** Brands of the listed trucks; only these are offered. */
   brands: string[]
   /** States the listed trucks' plates were registered in; only these are offered. */
@@ -31,7 +35,7 @@ const priceStepIndex = (price: number) => {
 
 const clampPrice = (price: number) => Math.min(PRICE_CEIL, Math.max(PRICE_FLOOR, price))
 
-export default function BrowseFilters({ onFilterChange, totalCars, onClose, brands, states }: BrowseFiltersProps) {
+export default function BrowseFilters({ onFilterChange, totalCars, onClose, hasActiveFilters, onClear, brands, states }: BrowseFiltersProps) {
   const [isPriceRangeOpen, setIsPriceRangeOpen] = useState(true)
   const [isBrandOpen, setIsBrandOpen] = useState(false)
   const [isYearOpen, setIsYearOpen] = useState(false)
@@ -108,17 +112,26 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
 
   return (
     <div className="browse-filters">
-      {onClose && (
-        <div className="browse-filters-mobile-header">
-          <h3>Filters</h3>
-          <button className="browse-filters-close-btn" onClick={onClose}>
+      <div className="browse-filters-mobile-header">
+        <h3>Filters</h3>
+        {/* On a phone the X closes the drawer; on desktop it clears the filters, when any are set. */}
+        {onClose && (
+          <button className="browse-filters-close-btn" onClick={onClose} aria-label="Close filters">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18"/>
               <line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-        </div>
-      )}
+        )}
+        {hasActiveFilters && onClear && (
+          <button className="browse-filters-clear-btn" onClick={onClear} aria-label="Clear all filters" title="Clear all filters">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        )}
+      </div>
       {/* Price Range */}
       <div className="filter-section">
         <button 

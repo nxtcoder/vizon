@@ -3168,6 +3168,45 @@ body {
   padding: 1.5rem;
 }
 
+/* Desktop: "Filters" with a clear-all X beside it; the phone's close X is hidden. */
+.browse-filters-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 32px;
+  margin-bottom: 0.25rem;
+}
+
+.browse-filters-mobile-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.browse-filters-close-btn {
+  display: none;
+}
+
+.browse-filters-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f3f4f6;
+  border-radius: 8px;
+  color: #1e293b;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.browse-filters-clear-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
 .filter-section {
   border-bottom: 1px solid #e5e7eb;
   padding: 1rem 0;
@@ -3764,10 +3803,15 @@ body {
     left: 0;
   }
 
+  .browse-filters-clear-btn {
+    display: none;
+  }
+
   .browse-filters-mobile-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 0;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid #e5e7eb;
     background: #ffffff;
