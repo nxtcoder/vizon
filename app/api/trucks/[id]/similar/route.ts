@@ -111,6 +111,7 @@ export async function GET(
           .eq('manufacturer', currentTruck.manufacturer)
           .neq('id', truckId)
           .eq('certified', true)
+          .eq('sold', false)
           .limit(4)
 
         // Get trucks by price range
@@ -119,6 +120,7 @@ export async function GET(
           .select('*')
           .neq('id', truckId)
           .eq('certified', true)
+          .eq('sold', false)
           .gte('price', priceMin)
           .lte('price', priceMax)
           .limit(4)
