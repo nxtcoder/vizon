@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { safeSupabaseQuery, type Truck } from '@/lib/supabase'
 import { truckCreateSchema, trucksListPaginationSchema } from '@/lib/validation'
 import {
@@ -13,10 +14,30 @@ import { resolveTruckListImageUrl } from '@/lib/truck-listing-images'
 
 export const dynamic = 'force-dynamic'
 
-/** RTO code from the plate, zero-padded the way RTO lists write it: "DL1LAE3215" -> "DL-01". */
+/** RTO code from the plate, zero-padded the way rto_offices keys it: "DL1LAE3215" -> "DL01". */
 const rtoCodeFromPlate = (plate?: string | null) => {
   const m = (plate || '').toUpperCase().replace(/[^A-Z0-9]/g, '').match(/^([A-Z]{2})(\d{1,2})/)
-  return m ? `${m[1]}-${m[2].padStart(2, '0')}` : null
+  return m ? `${m[1]}${m[2].padStart(2, '0')}` : null
+}
+
+/**
+ * State each plate was registered in, from rto_offices. That table has no
+ * public read policy, so it is read with the service-role key (server only).
+ */
+async function statesForPlates(plates: (string | null | undefined)[]) {
+  const codes = [...new Set(plates.map(rtoCodeFromPlate).filter((c): c is string => !!c))]
+  const byCode = new Map<string, string>()
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (codes.length && url && key) {
+    const { data, error } = await createClient(url, key)
+      .from('rto_offices')
+      .select('code, state_name')
+      .in('code', codes)
+    if (error) console.error('Error reading rto_offices:', error)
+    for (const row of data || []) byCode.set(row.code, row.state_name)
+  }
+  return (plate?: string | null) => byCode.get(rtoCodeFromPlate(plate) || '') ?? null
 }
 
 type TruckWithNumberPrice = {
@@ -37,7 +58,7 @@ type TruckWithNumberPrice = {
   rto: string | null
   fuel_type: string | null
   transmission: string | null
-  rto_code: string | null
+  rto_state: string | null
   ownership_number: number | null
   createdAt: Date
   updatedAt: Date
@@ -85,6 +106,8 @@ export async function GET(request: Request) {
           throw error
         }
 
+        const stateOf = await statesForPlates((trucks || []).map((t: Truck) => t.registration_number))
+
         // Convert Supabase format to API format (only certified rows, DB order — no injected/seed rows)
         const trucksWithNumberPrice: TruckWithNumberPrice[] = (trucks || []).map((truck: Truck) => ({
           id: truck.id,
@@ -104,7 +127,7 @@ export async function GET(request: Request) {
           rto: truck.rto ?? null,
           fuel_type: truck.fuel_type ?? null,
           transmission: truck.transmission ?? null,
-          rto_code: rtoCodeFromPlate(truck.registration_number),
+          rto_state: stateOf(truck.registration_number),
           ownership_number: truck.ownership_number ?? null,
           createdAt: new Date(truck.created_at),
           updatedAt: new Date(truck.updated_at),
@@ -132,7 +155,7 @@ export async function GET(request: Request) {
           rto: null,
           fuel_type: null,
           transmission: null,
-          rto_code: null,
+          rto_state: null,
           ownership_number: null,
         })) as TruckWithNumberPrice[]
         return {
@@ -205,6 +228,8 @@ export async function POST(request: Request) {
           return null
         }
 
+        const stateOf = await statesForPlates([result.registration_number])
+
         // Convert Supabase format to API format
         return {
           id: result.id,
@@ -224,7 +249,7 @@ export async function POST(request: Request) {
           rto: result.rto ?? null,
           fuel_type: result.fuel_type ?? null,
           transmission: result.transmission ?? null,
-          rto_code: rtoCodeFromPlate(result.registration_number),
+          rto_state: stateOf(result.registration_number),
           ownership_number: result.ownership_number ?? null,
           createdAt: new Date(result.created_at),
           updatedAt: new Date(result.updated_at),

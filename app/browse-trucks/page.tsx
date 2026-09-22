@@ -24,7 +24,7 @@ interface Truck {
   owner?: string
   brand?: string
   ownerNumber?: number
-  rtoCode?: string | null
+  rtoState?: string | null
 }
 
 // One name per brand, however the row spells it ("Tata", "TATA Motors", "Tata Motors").
@@ -81,7 +81,7 @@ const DEFAULT_FILTERS = {
   selectedOwner: '',
   transmission: '',
   location: '',
-  selectedRTOLocation: '',
+  selectedState: '',
   searchQuery: ''
 }
 
@@ -181,7 +181,7 @@ function BrowseTrucksContent() {
           owner: ordinalOwner(ownerNumber),
           ownerNumber,
           brand: brandName(truck.manufacturer),
-          rtoCode: truck.rto_code ?? null
+          rtoState: truck.rto_state ?? null
         }
       })
       
@@ -394,11 +394,10 @@ function BrowseTrucksContent() {
       console.log('After location filter:', filtered.length)
     }
 
-    // RTO Location filter - the code the truck's plate was registered under
-    if (filters.selectedRTOLocation) {
-      const code = filters.selectedRTOLocation.match(/\(([^)]+)\)$/)?.[1] || filters.selectedRTOLocation
-      filtered = filtered.filter(truck => truck.rtoCode === code)
-      console.log('After RTO location filter:', filtered.length)
+    // State filter - the state the truck's plate was registered in
+    if (filters.selectedState) {
+      filtered = filtered.filter(truck => truck.rtoState === filters.selectedState)
+      console.log('After state filter:', filtered.length)
     }
 
     console.log('FINAL FILTERED TRUCKS:', filtered.length)
@@ -452,7 +451,7 @@ function BrowseTrucksContent() {
   }, [])
 
   const brands = [...new Set(trucks.map(t => t.brand).filter((b): b is string => !!b))].sort()
-  const rtoCodes = [...new Set(trucks.map(t => t.rtoCode).filter((c): c is string => !!c))]
+  const states = [...new Set(trucks.map(t => t.rtoState).filter((s): s is string => !!s))].sort()
 
   return (
     <div className="browse-trucks-page">
@@ -520,7 +519,7 @@ function BrowseTrucksContent() {
           <BrowseFilters 
             key={filtersKey}
             brands={brands}
-            rtoCodes={rtoCodes}
+            states={states}
             onFilterChange={handleFilterChange}
             totalCars={filteredTrucks.length}
             onClose={() => setShowFilters(false)}
