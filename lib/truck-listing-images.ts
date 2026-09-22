@@ -172,10 +172,10 @@ function shouldUseTata1412LptListingHero(truck: {
   model?: string | null
   manufacturer?: string | null
 }): boolean {
-  const n = (truck.name || '').toLowerCase()
+  // Truck 37 only ("1412G LPT"): other Tata 1412s, like 57 and 59, have their own photos.
+  const n = (truck.name || '').toLowerCase().trim()
   const mo = (truck.model || '').toLowerCase()
-  const haystack = `${n} ${mo}`.replace(/\s+/g, ' ')
-  return haystack.includes('tata') && haystack.includes('1412') && haystack.includes('lpt')
+  return n === 'tata 1412 lpt' || mo.includes('1412g lpt')
 }
 
 function shouldUseMahindraBoleroMaxitruckPlusListingHero(truck: {
@@ -198,20 +198,22 @@ function shouldUseHr55X4498ListingHero(truck: {
   name?: string | null
   model?: string | null
   manufacturer?: string | null
+  imageUrl?: string | null
+  image_url?: string | null
 }): boolean {
-  const n = normalizeReg(truck.name || '')
-  const mo = normalizeReg(truck.model || '')
-  return n === 'hr55x4498' || mo === 'hr55x4498'
+  // The plate is no longer the name, but it is in the photo folder (and in the hero's own path).
+  return normalizeReg(truck.imageUrl ?? truck.image_url ?? '').includes('hr55x4498')
 }
 
 function shouldUseHr55X0253ListingHero(truck: {
   name?: string | null
   model?: string | null
   manufacturer?: string | null
+  imageUrl?: string | null
+  image_url?: string | null
 }): boolean {
-  const n = normalizeReg(truck.name || '')
-  const mo = normalizeReg(truck.model || '')
-  return n === 'hr55x0253' || mo === 'hr55x0253'
+  // The plate is no longer the name, but it is in the photo folder (and in the hero's own path).
+  return normalizeReg(truck.imageUrl ?? truck.image_url ?? '').includes('hr55x0253')
 }
 
 function shouldUseEicherPro1075FHsdListingHero(truck: {
