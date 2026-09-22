@@ -51,6 +51,7 @@ export async function GET(request: Request) {
           .from('trucks')
           .select('*', { count: 'exact' })
           .eq('certified', true)
+          .eq('sold', false)
           .or(`name.ilike.${searchQuery},manufacturer.ilike.${searchQuery},model.ilike.${searchQuery}`)
           .order('created_at', { ascending: false })
           .range(skip, skip + limit - 1)

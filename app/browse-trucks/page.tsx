@@ -20,9 +20,7 @@ interface Truck {
   location: string
   image: string
   certified: boolean
-  availability?: string
   features?: string[]
-  color?: string
   owner?: string
   brand?: string
   ownerNumber?: number
@@ -49,6 +47,28 @@ const brandName = (manufacturer?: string | null) => {
   return BRAND_NAMES.find(([re]) => re.test(m))?.[1] || m
 }
 
+const SORT_OPTIONS = [
+  { value: 'newest', label: 'Newest listed' },
+  { value: 'price-asc', label: 'Price: Low to High' },
+  { value: 'price-desc', label: 'Price: High to Low' },
+  { value: 'year-desc', label: 'Year: Newest first' },
+  { value: 'year-asc', label: 'Year: Oldest first' },
+] as const
+type SortBy = (typeof SORT_OPTIONS)[number]['value']
+
+const priceValue = (price: string) => parseInt(price.replace(/[^0-9]/g, '')) || 0
+
+/** "newest" keeps the API's order, newest listing first. */
+const sortTrucks = <T extends { price: string; year: number }>(list: T[], sortBy: SortBy) => {
+  if (sortBy === 'newest') return list
+  const sorted = [...list]
+  if (sortBy === 'price-asc') sorted.sort((a, b) => priceValue(a.price) - priceValue(b.price))
+  if (sortBy === 'price-desc') sorted.sort((a, b) => priceValue(b.price) - priceValue(a.price))
+  if (sortBy === 'year-desc') sorted.sort((a, b) => b.year - a.year)
+  if (sortBy === 'year-asc') sorted.sort((a, b) => a.year - b.year)
+  return sorted
+}
+
 const ordinalOwner = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'} Owner`
 
 const DEFAULT_FILTERS = {
@@ -58,9 +78,7 @@ const DEFAULT_FILTERS = {
   selectedYear: '',
   selectedKmDriven: '',
   selectedFuelTypes: [] as string[],
-  selectedColors: [] as string[],
   selectedOwner: '',
-  selectedAvailability: '',
   transmission: '',
   location: '',
   selectedRTOLocation: '',
@@ -74,6 +92,7 @@ function BrowseTrucksContent() {
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [showSort, setShowSort] = useState(false)
+  const [sortBy, setSortBy] = useState<SortBy>('newest')
   const [filters, setFilters] = useState(DEFAULT_FILTERS)
   // Remounting the sidebar is what clears its own checkboxes on "Clear All"
   const [filtersKey, setFiltersKey] = useState(0)
@@ -158,9 +177,7 @@ function BrowseTrucksContent() {
         certified: truck.certified ?? true,
         manufacturer: truck.manufacturer,
         model: truck.model,
-          availability: 'In stock',
           features: features,
-          color: truck.color || undefined,
           owner: ordinalOwner(ownerNumber),
           ownerNumber,
           brand: brandName(truck.manufacturer),
@@ -204,9 +221,7 @@ function BrowseTrucksContent() {
           location: `${sub.city || 'Unknown'}, ${sub.state || 'Unknown'}`,
           image: imageUrl,
           certified: sub.certified ?? false,
-          availability: sub.negotiable ? 'Negotiable' : 'Fixed Price',
           features: features,
-          color: sub.color || undefined,
           owner: ordinalOwner(ownerNumber),
           ownerNumber,
           brand: brandName(sub.manufacturer)
@@ -251,8 +266,7 @@ function BrowseTrucksContent() {
     // Price filter - convert price string to rupees for comparison
     filtered = filtered.filter(truck => {
       // Remove currency symbol and commas, then parse as rupees
-      const priceText = truck.price.replace(/[^0-9]/g, '')
-      const priceInRupees = parseInt(priceText) || 0
+      const priceInRupees = priceValue(truck.price)
       const passes = priceInRupees >= filters.priceMin && priceInRupees <= filters.priceMax
       if (!passes) {
         console.log(`Price filter removed: ${truck.name} (₹${priceInRupees})`)
@@ -336,18 +350,6 @@ function BrowseTrucksContent() {
       console.log('After fuel type filter:', filtered.length)
     }
 
-    // Color filter
-    if (filters.selectedColors && filters.selectedColors.length > 0) {
-      filtered = filtered.filter(truck => {
-        if (!truck.color) return false
-        return filters.selectedColors.some(color => 
-          truck.color!.toLowerCase().includes(color.toLowerCase()) ||
-          color.toLowerCase().includes(truck.color!.toLowerCase())
-        )
-      })
-      console.log('After color filter:', filtered.length)
-    }
-
     // Owner filter
     if (filters.selectedOwner) {
       // "5+ Owner" is 5 or more; the rest name one count ("2nd Owner")
@@ -359,14 +361,6 @@ function BrowseTrucksContent() {
       console.log('After owner filter:', filtered.length)
     }
 
-    // Availability filter
-    if (filters.selectedAvailability) {
-      filtered = filtered.filter(truck =>
-        truck.availability === filters.selectedAvailability
-      )
-      console.log('After availability filter:', filtered.length)
-    }
-    
     // Transmission filter (if needed)
     if (filters.transmission) {
       filtered = filtered.filter(truck =>
@@ -484,6 +478,24 @@ function BrowseTrucksContent() {
             </svg>
             <span>Sort</span>
           </button>
+          {showSort && (
+            <div className="browse-sort-menu" role="listbox" aria-label="Sort trucks">
+              {SORT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  role="option"
+                  aria-selected={sortBy === option.value}
+                  className={`browse-sort-option ${sortBy === option.value ? 'active' : ''}`}
+                  onClick={() => {
+                    setSortBy(option.value)
+                    setShowSort(false)
+                  }}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          )}
           <button 
             className="browse-action-btn filters-btn"
             onClick={() => setShowFilters(!showFilters)}
@@ -521,6 +533,16 @@ function BrowseTrucksContent() {
             <h1 className="browse-trucks-title">Browse All Trucks</h1>
             <div className="browse-trucks-count-wrapper">
               <p className="browse-trucks-count">Found {filteredTrucks.length} trucks</p>
+              <select
+                className="browse-sort-select"
+                aria-label="Sort trucks"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortBy)}
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
               {isAnyFilterApplied() && (
                 <button 
                   onClick={clearAllFilters}
@@ -549,7 +571,7 @@ function BrowseTrucksContent() {
             </div>
           ) : (
             <div className="browse-trucks-grid">
-              {filteredTrucks.map((truck) => (
+              {sortTrucks(filteredTrucks, sortBy).map((truck) => (
                 <TruckCard key={truck.id} truck={truck} />
               ))}
             </div>

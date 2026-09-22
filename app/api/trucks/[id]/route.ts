@@ -69,6 +69,7 @@ export async function GET(
           .from('trucks')
           .select('*')
           .eq('id', truckId)
+          .eq('sold', false) // a sold truck is not shown anywhere on the site
           .single()
 
         if (error || !result) {

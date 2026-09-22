@@ -3037,6 +3037,53 @@ body {
   position: relative;
 }
 
+/* Sort: a select in the results header on desktop, a menu under the Sort button on mobile */
+.browse-sort-select {
+  margin-left: auto;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.browse-sort-menu {
+  position: absolute;
+  top: 100%;
+  left: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  z-index: 101;
+}
+
+.browse-sort-option {
+  padding: 0.875rem 1rem;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.browse-sort-option:last-child {
+  border-bottom: none;
+}
+
+.browse-sort-option.active {
+  color: #dc2626;
+  font-weight: 600;
+}
+
 /* Action Buttons (Sort, Filters, Clear All) */
 .browse-action-buttons {
   display: none;
@@ -3680,6 +3727,10 @@ body {
 @media (max-width: 768px) {
   .browse-action-buttons {
     display: flex;
+  }
+
+  .browse-sort-select {
+    display: none;
   }
 
   .browse-filters-sidebar {

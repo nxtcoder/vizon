@@ -70,12 +70,14 @@ export async function GET(request: Request) {
           .from('trucks')
           .select('*', { count: 'exact', head: true })
           .eq('certified', true)
+          .eq('sold', false)
 
         // Get paginated trucks
         const { data: trucks, error } = await supabase
           .from('trucks')
           .select('*')
           .eq('certified', true)
+          .eq('sold', false)
           .order('created_at', { ascending: false })
           .range(skip, skip + limit - 1)
 

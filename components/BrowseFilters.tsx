@@ -12,10 +12,6 @@ interface BrowseFiltersProps {
   rtoCodes: string[]
 }
 
-// No truck has a colour or an availability yet: the form doesn't ask either
-// (NA-FIELDS.md). The filters stay hidden until that data exists.
-const SHOW_COLOR_AND_AVAILABILITY = false
-
 // City names for RTO codes, written "City (CODE)".
 const RTO_LOCATIONS = [
     // Maharashtra
@@ -136,9 +132,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
   const [isYearOpen, setIsYearOpen] = useState(false)
   const [isKmDrivenOpen, setIsKmDrivenOpen] = useState(false)
   const [isFuelTypeOpen, setIsFuelTypeOpen] = useState(false)
-  const [isColorOpen, setIsColorOpen] = useState(false)
   const [isOwnerOpen, setIsOwnerOpen] = useState(false)
-  const [isAvailabilityOpen, setIsAvailabilityOpen] = useState(false)
   const [isRTOLocationOpen, setIsRTOLocationOpen] = useState(false)
 
   const [priceMin, setPriceMin] = useState(50000)
@@ -147,9 +141,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
   const [selectedYear, setSelectedYear] = useState('')
   const [selectedKmDriven, setSelectedKmDriven] = useState('')
   const [selectedFuelTypes, setSelectedFuelTypes] = useState<string[]>([])
-  const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [selectedOwner, setSelectedOwner] = useState('')
-  const [selectedAvailability, setSelectedAvailability] = useState('')
   const [selectedRTOLocation, setSelectedRTOLocation] = useState('')
   const [rtoSearchQuery, setRtoSearchQuery] = useState('')
   const rtoOptions = [...new Set(rtoCodes)].sort().map(rtoLabel)
@@ -163,13 +155,11 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       selectedYear,
       selectedKmDriven,
       selectedFuelTypes,
-      selectedColors,
       selectedOwner,
-      selectedAvailability,
       selectedRTOLocation
     })
   }, [priceMin, priceMax, selectedBrands, selectedYear, selectedKmDriven, 
-      selectedFuelTypes, selectedColors, selectedOwner, selectedAvailability, selectedRTOLocation, onFilterChange])
+      selectedFuelTypes, selectedOwner, selectedRTOLocation, onFilterChange])
 
   const handleReset = () => {
     setPriceMin(50000)
@@ -178,9 +168,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
     setSelectedYear('')
     setSelectedKmDriven('')
     setSelectedFuelTypes([])
-    setSelectedColors([])
     setSelectedOwner('')
-    setSelectedAvailability('')
     setSelectedRTOLocation('')
     setRtoSearchQuery('')
     onFilterChange({
@@ -190,9 +178,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
       selectedYear: '',
       selectedKmDriven: '',
       selectedFuelTypes: [],
-      selectedColors: [],
       selectedOwner: '',
-      selectedAvailability: '',
       selectedRTOLocation: ''
     })
   }
@@ -206,12 +192,6 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
   const toggleFuelType = (fuel: string) => {
     setSelectedFuelTypes(prev => 
       prev.includes(fuel) ? prev.filter(f => f !== fuel) : [...prev, fuel]
-    )
-  }
-
-  const toggleColor = (color: string) => {
-    setSelectedColors(prev => 
-      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
     )
   }
 
@@ -426,81 +406,6 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, bran
           </div>
         )}
       </div>
-
-      {/* Color */}
-      {SHOW_COLOR_AND_AVAILABILITY && (
-        <div className="filter-section">
-          <button 
-            className="filter-section-header"
-            onClick={() => setIsColorOpen(!isColorOpen)}
-          >
-            <span className="filter-section-title">
-              Color
-            </span>
-            <span className={`filter-arrow ${isColorOpen ? 'open' : ''}`}>
-              {isColorOpen ? '−' : '+'}
-            </span>
-          </button>
-          {isColorOpen && (
-            <div className="filter-section-content">
-              <div className="filter-checkboxes">
-                {['White', 'Black', 'Silver', 'Red', 'Blue', 'Grey', 'Brown', 'Other'].map(color => (
-                  <label key={color} className="filter-checkbox">
-                    <input 
-                      type="checkbox" 
-                      checked={selectedColors.includes(color)}
-                      onChange={() => toggleColor(color)}
-                    />
-                    <span>{color}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Availability */}
-      {SHOW_COLOR_AND_AVAILABILITY && (
-        <div className="filter-section">
-          <button 
-            className="filter-section-header"
-            onClick={() => setIsAvailabilityOpen(!isAvailabilityOpen)}
-          >
-            <span className="filter-section-title">
-              Availability
-            </span>
-            <span className={`filter-arrow ${isAvailabilityOpen ? 'open' : ''}`}>
-              {isAvailabilityOpen ? '−' : '+'}
-            </span>
-          </button>
-          {isAvailabilityOpen && (
-            <div className="filter-section-content">
-              <div className="filter-checkboxes">
-                {['In stock', 'Booked', 'Upcoming'].map(availability => (
-                  <label 
-                    key={availability} 
-                    className="filter-checkbox"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setSelectedAvailability(selectedAvailability === availability ? '' : availability)
-                    }}
-                  >
-                    <input 
-                      type="radio" 
-                      name="availability"
-                      checked={selectedAvailability === availability}
-                      onChange={() => {}}
-                      readOnly
-                    />
-                    <span>{availability}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Owner */}
       <div className="filter-section">
