@@ -24,6 +24,20 @@ const reportDownloadUrl = (url: string, fileName: string) => {
 
 const isVideoUrl = (url?: string | null) => /\.(mp4|mov|webm)(\?|$)/i.test(url || '')
 
+/** "…/58-cold-start.mp4" -> 58: the showcase position the form pipeline names each file with. */
+// Two or three digits only: older uploads start with a 13-digit timestamp.
+const showcaseNumber = (url: string) => Number(url.match(/\/(\d{2,3})-[^/]*$/)?.[1] ?? NaN)
+
+/**
+ * Form listings number every photo and video in showcase order (front, sides,
+ * back, … engine videos, tyres), so they are merged by that number. Older
+ * listings, whose files are not numbered, keep the order they are stored in.
+ */
+const sortByShowcaseNumber = (urls: string[]) =>
+  urls.every((u) => Number.isFinite(showcaseNumber(u)))
+    ? [...urls].sort((a, b) => showcaseNumber(a) - showcaseNumber(b))
+    : urls
+
 /**
  * trucks.payload_capacity_net/_gross are kg and payload_capacity_ft is feet.
  * Kg render as tonnes; anything that isn't a number renders as written.
@@ -859,10 +873,10 @@ export default function TruckDetailsPage() {
       // The truck's own photos and videos, written to `trucks` by the forms
       // pipeline and the backfill, come first. The folder lookup by name is the
       // fallback, and gives some trucks another truck's photos.
-      const dbMedia = [
+      const dbMedia = sortByShowcaseNumber([
         ...(Array.isArray(truck.gallery) ? truck.gallery : []),
         ...(Array.isArray(truck.videos) ? truck.videos : []),
-      ].filter((url: unknown): url is string => typeof url === 'string' && url.length > 0)
+      ].filter((url: unknown): url is string => typeof url === 'string' && url.length > 0))
       const truckName = dbMedia.length > 0 ? '' : truck.name || ''
       if (dbMedia.length > 0) setFetchedImages(dbMedia)
 
