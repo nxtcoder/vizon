@@ -5,23 +5,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-/** Build a single location line for browse cards when DB fields are partial or missing. */
+/** "City, State" for browse cards ("Gurugram, Haryana"); the state is left off when it is the city ("Delhi"). */
 export function formatTruckListingLocation(truck: {
   location?: string | null
   city?: string | null
   state?: string | null
   rto?: string | null
 }): string {
-  const loc = truck.location?.trim()
-  if (loc) return loc
-  const city = truck.city?.trim()
+  const city = truck.city?.trim() || truck.location?.trim()
   const state = truck.state?.trim()
-  if (city && state) return `${city}, ${state}`
-  if (city) return city
-  if (state) return state
-  const rto = truck.rto?.trim()
-  if (rto) return rto
-  return 'Unknown'
+  if (city && state) return city.toLowerCase() === state.toLowerCase() ? city : `${city}, ${state}`
+  return city || state || truck.rto?.trim() || 'Unknown'
 }
 
 
