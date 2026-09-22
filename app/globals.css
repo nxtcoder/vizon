@@ -3150,6 +3150,18 @@ body {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   max-height: calc(100vh - 120px);
   overflow-y: auto;
+  /* Always show that the filters scroll; overlay scrollbars hide until used. */
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.browse-filters-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.browse-filters-sidebar::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
 }
 
 .browse-filters {
