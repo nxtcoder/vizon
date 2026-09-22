@@ -24,6 +24,47 @@ interface Truck {
   features?: string[]
   color?: string
   owner?: string
+  brand?: string
+  ownerNumber?: number
+  rtoCode?: string | null
+}
+
+// One name per brand, however the row spells it ("Tata", "TATA Motors", "Tata Motors").
+const BRAND_NAMES: Array<[RegExp, string]> = [
+  [/^tata/i, 'Tata Motors'],
+  [/^ashok/i, 'Ashok Leyland'],
+  [/^mahindra/i, 'Mahindra'],
+  [/^eicher/i, 'Eicher Motors'],
+  [/^sml/i, 'SML Isuzu'],
+  [/^bajaj/i, 'Bajaj'],
+  [/^bharat\s*benz/i, 'BharatBenz'],
+  [/^force/i, 'Force Motors'],
+  [/^volvo/i, 'Volvo'],
+  [/^maruti/i, 'Maruti Suzuki'],
+  [/^toyota/i, 'Toyota'],
+]
+const brandName = (manufacturer?: string | null) => {
+  const m = (manufacturer || '').trim()
+  if (!m) return undefined
+  return BRAND_NAMES.find(([re]) => re.test(m))?.[1] || m
+}
+
+const ordinalOwner = (n: number) => `${n}${n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th'} Owner`
+
+const DEFAULT_FILTERS = {
+  priceMin: 50000,
+  priceMax: 7000000,
+  selectedBrands: [] as string[],
+  selectedYear: '',
+  selectedKmDriven: '',
+  selectedFuelTypes: [] as string[],
+  selectedColors: [] as string[],
+  selectedOwner: '',
+  selectedAvailability: '',
+  transmission: '',
+  location: '',
+  selectedRTOLocation: '',
+  searchQuery: ''
 }
 
 function BrowseTrucksContent() {
@@ -33,21 +74,9 @@ function BrowseTrucksContent() {
   const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [showSort, setShowSort] = useState(false)
-  const [filters, setFilters] = useState({
-    priceMin: 50000,
-    priceMax: 7000000,
-    selectedBrands: [] as string[],
-    selectedYear: '',
-    selectedKmDriven: '',
-    selectedFuelTypes: [] as string[],
-    selectedColors: [] as string[],
-    selectedOwner: '',
-    selectedAvailability: '',
-    transmission: '',
-    location: '',
-    selectedRTOLocation: '',
-    searchQuery: ''
-  })
+  const [filters, setFilters] = useState(DEFAULT_FILTERS)
+  // Remounting the sidebar is what clears its own checkboxes on "Clear All"
+  const [filtersKey, setFiltersKey] = useState(0)
 
   const fetchTrucks = useCallback(async () => {
     try {
@@ -112,6 +141,7 @@ function BrowseTrucksContent() {
         })()
 
         const kilometers = typeof truck.kilometers === 'number' ? truck.kilometers : null
+        const ownerNumber = typeof truck.ownership_number === 'number' ? truck.ownership_number : 1
         const fuelType = (truck.fuel_type as string | null | undefined) || null
         const transmission = (truck.transmission as string | null | undefined) || null
 
@@ -131,7 +161,10 @@ function BrowseTrucksContent() {
           availability: 'In stock',
           features: features,
           color: truck.color || undefined,
-          owner: truck.ownerNumber ? `${truck.ownerNumber}${truck.ownerNumber === 1 ? 'st' : truck.ownerNumber === 2 ? 'nd' : truck.ownerNumber === 3 ? 'rd' : 'th'} Owner` : '1st Owner'
+          owner: ordinalOwner(ownerNumber),
+          ownerNumber,
+          brand: brandName(truck.manufacturer),
+          rtoCode: truck.rto_code ?? null
         }
       })
       
@@ -158,9 +191,7 @@ function BrowseTrucksContent() {
           }
         }
         
-        // Format owner number
         const ownerNumber = sub.ownerNumber || 1
-        const ownerText = `${ownerNumber}${ownerNumber === 1 ? 'st' : ownerNumber === 2 ? 'nd' : ownerNumber === 3 ? 'rd' : 'th'} Owner`
         
         return {
           id: sub.id + 10000, // Offset ID to avoid conflicts
@@ -176,7 +207,9 @@ function BrowseTrucksContent() {
           availability: sub.negotiable ? 'Negotiable' : 'Fixed Price',
           features: features,
           color: sub.color || undefined,
-          owner: ownerText
+          owner: ordinalOwner(ownerNumber),
+          ownerNumber,
+          brand: brandName(sub.manufacturer)
         }
       })
       
@@ -210,10 +243,7 @@ function BrowseTrucksContent() {
     if (filters.searchQuery && filters.searchQuery.trim()) {
       const query = filters.searchQuery.toLowerCase().trim()
       filtered = filtered.filter(truck => {
-        const truckName = truck.name.toLowerCase()
-        // Also check manufacturer and model if available
-        const manufacturer = truck.name.split(' ').slice(1).join(' ').toLowerCase() // Extract manufacturer from name
-        return truckName.includes(query) || manufacturer.includes(query)
+        return truck.name.toLowerCase().includes(query) || (truck.brand || '').toLowerCase().includes(query)
       })
       console.log('After search filter:', filtered.length)
     }
@@ -235,11 +265,7 @@ function BrowseTrucksContent() {
 
     // Brand filter
     if (filters.selectedBrands && filters.selectedBrands.length > 0) {
-      filtered = filtered.filter(truck =>
-        filters.selectedBrands.some((brand: string) => 
-          truck.name.toLowerCase().includes(brand.toLowerCase())
-        )
-      )
+      filtered = filtered.filter(truck => !!truck.brand && filters.selectedBrands.includes(truck.brand))
       console.log('After brand filter:', filtered.length)
     }
 
@@ -324,9 +350,11 @@ function BrowseTrucksContent() {
 
     // Owner filter
     if (filters.selectedOwner) {
+      // "5+ Owner" is 5 or more; the rest name one count ("2nd Owner")
+      const wanted = parseInt(filters.selectedOwner)
       filtered = filtered.filter(truck => {
-        if (!truck.owner) return false
-        return truck.owner === filters.selectedOwner
+        if (!truck.ownerNumber) return false
+        return filters.selectedOwner.includes('+') ? truck.ownerNumber >= wanted : truck.ownerNumber === wanted
       })
       console.log('After owner filter:', filtered.length)
     }
@@ -372,22 +400,11 @@ function BrowseTrucksContent() {
       console.log('After location filter:', filtered.length)
     }
 
-    // RTO Location filter
+    // RTO Location filter - the code the truck's plate was registered under
     if (filters.selectedRTOLocation) {
-      // Extract city name and RTO code from format "City (CODE)"
-      const rtoMatch = filters.selectedRTOLocation.match(/^(.+?)\s*\(([^)]+)\)$/)
-      if (rtoMatch) {
-        const cityName = rtoMatch[1].trim()
-        const rtoCode = rtoMatch[2].trim()
-        
-        filtered = filtered.filter(truck => {
-          const truckLocation = truck.location.toLowerCase()
-          // Match by city name or RTO code
-          return truckLocation.includes(cityName.toLowerCase()) || 
-                 truckLocation.includes(rtoCode.toLowerCase())
-        })
-        console.log('After RTO location filter:', filtered.length)
-      }
+      const code = filters.selectedRTOLocation.match(/\(([^)]+)\)$/)?.[1] || filters.selectedRTOLocation
+      filtered = filtered.filter(truck => truck.rtoCode === code)
+      console.log('After RTO location filter:', filtered.length)
     }
 
     console.log('FINAL FILTERED TRUCKS:', filtered.length)
@@ -418,43 +435,30 @@ function BrowseTrucksContent() {
     applyFilters()
   }, [applyFilters])
 
-  const isAnyFilterApplied = () => {
-    const defaultFilters = {
-      priceMin: 50000,
-      priceMax: 7000000,
-      selectedBrands: [],
-      selectedYear: '',
-      selectedKmDriven: '',
-      selectedFuelTypes: [],
-      selectedColors: [],
-      selectedOwner: '',
-      selectedAvailability: '',
-      transmission: '',
-      location: '',
-      selectedRTOLocation: ''
-    }
+  const isAnyFilterApplied = () =>
+    (Object.keys(DEFAULT_FILTERS) as Array<keyof typeof DEFAULT_FILTERS>).some((key) => {
+      const value = filters[key]
+      const initial = DEFAULT_FILTERS[key]
+      if (Array.isArray(value)) return value.length > 0
+      if (typeof value === 'string') return value.trim() !== ''
+      return value !== initial
+    })
 
-    return (
-      filters.priceMin !== defaultFilters.priceMin ||
-      filters.priceMax !== defaultFilters.priceMax ||
-      filters.selectedBrands.length > 0 ||
-      filters.selectedYear !== '' ||
-      filters.selectedKmDriven !== '' ||
-      filters.selectedFuelTypes.length > 0 ||
-      filters.selectedColors.length > 0 ||
-      filters.selectedOwner !== '' ||
-      filters.selectedAvailability !== '' ||
-      filters.transmission !== '' ||
-      filters.location !== '' ||
-      filters.selectedRTOLocation !== '' ||
-      filters.searchQuery.trim() !== ''
-    )
+  const clearAllFilters = () => {
+    setFilters(DEFAULT_FILTERS)
+    setFiltersKey((k) => k + 1)
+    // Clear search from URL
+    const url = new URL(window.location.href)
+    url.searchParams.delete('search')
+    window.history.replaceState({}, '', url.pathname + url.search)
   }
 
-
-  const handleFilterChange = useCallback((newFilters: any) => {
-    setFilters(newFilters)
+  const handleFilterChange = useCallback((newFilters: Partial<typeof DEFAULT_FILTERS>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }))
   }, [])
+
+  const brands = [...new Set(trucks.map(t => t.brand).filter((b): b is string => !!b))].sort()
+  const rtoCodes = [...new Set(trucks.map(t => t.rtoCode).filter((c): c is string => !!c))]
 
   return (
     <div className="browse-trucks-page">
@@ -492,27 +496,7 @@ function BrowseTrucksContent() {
           {isAnyFilterApplied() && (
             <button 
               className="browse-action-btn clear-all-btn"
-              onClick={() => {
-                setFilters({
-                  priceMin: 50000,
-                  priceMax: 7000000,
-                  selectedBrands: [],
-                  selectedYear: '',
-                  selectedKmDriven: '',
-                  selectedFuelTypes: [],
-                  selectedColors: [],
-                  selectedOwner: '',
-                  selectedAvailability: '',
-                  transmission: '',
-                  location: '',
-                  selectedRTOLocation: '',
-                  searchQuery: ''
-                })
-                // Clear search from URL
-                const url = new URL(window.location.href)
-                url.searchParams.delete('search')
-                window.history.replaceState({}, '', url.pathname + url.search)
-              }}
+              onClick={clearAllFilters}
             >
               Clear All
             </button>
@@ -522,6 +506,9 @@ function BrowseTrucksContent() {
         {/* Left Sidebar - Filters */}
         <aside className={`browse-filters-sidebar ${showFilters ? 'mobile-open' : ''}`}>
           <BrowseFilters 
+            key={filtersKey}
+            brands={brands}
+            rtoCodes={rtoCodes}
             onFilterChange={handleFilterChange}
             totalCars={filteredTrucks.length}
             onClose={() => setShowFilters(false)}
@@ -536,27 +523,7 @@ function BrowseTrucksContent() {
               <p className="browse-trucks-count">Found {filteredTrucks.length} trucks</p>
               {isAnyFilterApplied() && (
                 <button 
-                  onClick={() => {
-                    setFilters({
-                      priceMin: 50000,
-                      priceMax: 7000000,
-                      selectedBrands: [],
-                      selectedYear: '',
-                      selectedKmDriven: '',
-                      selectedFuelTypes: [],
-                      selectedColors: [],
-                      selectedOwner: '',
-                      selectedAvailability: '',
-                      transmission: '',
-                      location: '',
-                      selectedRTOLocation: '',
-                      searchQuery: ''
-                    })
-                    // Clear search from URL
-                    const url = new URL(window.location.href)
-                    url.searchParams.delete('search')
-                    window.history.replaceState({}, '', url.pathname + url.search)
-                  }}
+                  onClick={clearAllFilters}
                   className="clear-all-main-btn"
                 >
                   Clear All
@@ -574,27 +541,7 @@ function BrowseTrucksContent() {
             <div className="browse-trucks-empty">
               <p>No trucks found matching your criteria.</p>
               <button 
-                onClick={() => {
-                  setFilters({
-                    priceMin: 50000,
-                    priceMax: 7000000,
-                    selectedBrands: [],
-                    selectedYear: '',
-                    selectedKmDriven: '',
-                    selectedFuelTypes: [],
-                    selectedColors: [],
-                    selectedOwner: '',
-                    selectedAvailability: '',
-                    transmission: '',
-                    location: '',
-                    selectedRTOLocation: '',
-                    searchQuery: ''
-                  })
-                  // Clear search from URL
-                  const url = new URL(window.location.href)
-                  url.searchParams.delete('search')
-                  window.history.replaceState({}, '', url.pathname + url.search)
-                }}
+                onClick={clearAllFilters}
                 className="reset-filters-btn"
               >
                 Reset Filters
