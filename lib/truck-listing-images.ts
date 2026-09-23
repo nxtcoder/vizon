@@ -182,12 +182,18 @@ function shouldUseMahindraBoleroMaxitruckPlusListingHero(truck: {
   name?: string | null
   model?: string | null
   manufacturer?: string | null
+  imageUrl?: string | null
+  image_url?: string | null
 }): boolean {
   const m = (truck.manufacturer || '').toLowerCase()
   const n = (truck.name || '').toLowerCase()
   const mo = (truck.model || '').toLowerCase()
   const haystack = `${m} ${n} ${mo}`.replace(/\s+/g, ' ')
-  return haystack.includes('mahindra') && haystack.includes('bolero') && haystack.includes('maxitruck')
+  // The hero is truck 41's photo. 46 and 47 are Bolero Maxitrucks too, so the
+  // truck's own folder (or the hero, once resolved) decides, not the name.
+  const img = (truck.imageUrl ?? truck.image_url ?? '').toLowerCase()
+  const isTruck41 = img.includes('/mahindra_bolero_maxitruck_plus/') || img.includes('mahindra-bolero-maxitruck-plus-hero')
+  return isTruck41 && haystack.includes('mahindra') && haystack.includes('bolero')
 }
 
 function normalizeReg(v: string): string {
@@ -253,11 +259,16 @@ function shouldUseTataAceGold7908ListingHero(truck: {
   name?: string | null
   model?: string | null
   manufacturer?: string | null
+  imageUrl?: string | null
+  image_url?: string | null
 }): boolean {
   const n = (truck.name || '').toLowerCase()
   const mo = (truck.model || '').toLowerCase()
   const haystack = `${n} ${mo}`
-  return haystack.includes('tata ace gold') && haystack.includes('7908')
+  // Since 24 Sep 2026 the name no longer says "(7908)"; its folder still does.
+  const img = (truck.imageUrl ?? truck.image_url ?? '').toLowerCase()
+  const byFolder = img.includes('/tata_ace_gold_7908/') || img.includes('tata-ace-gold-7908-hero')
+  return byFolder || (haystack.includes('tata ace gold') && haystack.includes('7908'))
 }
 
 function shouldUseEicherPro2110LListingHero(truck: {

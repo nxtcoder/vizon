@@ -820,12 +820,15 @@ export default function TruckDetailsPage() {
       const isEicher2110L = (truck.name || '').toLowerCase().includes('2110') && ((truck.name || '').toLowerCase().includes('2110l') || (truck.model || '').toUpperCase().includes('2110L'))
       const isBajajMaximaCNGFinance = (truck.name || '').toLowerCase().includes('bajaj') && (truck.name || '').toLowerCase().includes('maxima') && (truck.name || '').toLowerCase().includes('cng')
       const is609G = (truck.name || '').toLowerCase().includes('609') && ((truck.name || '').toLowerCase().includes('609g') || (truck.name || '').toLowerCase().includes('609 g')) && ((truck.name || '').toLowerCase().includes('tata') || truck.manufacturer === 'Tata Motors')
-      const is709gLPTFinance = (truck.name || '').toLowerCase().includes('709') && ((truck.name || '').toLowerCase().includes('709g') || (truck.name || '').toLowerCase().includes('709 g')) && (truck.name || '').toLowerCase().includes('lpt') && ((truck.name || '').toLowerCase().includes('tata') || truck.manufacturer === 'Tata Motors')
+      // Trucks were renamed "<year> <brand> <model>" on 24 Sep 2026. The plates
+      // keep 39 and 41 on the amounts their old names matched, and keep 51
+      // (DL1LAJ8588, a 709G LPT whose old name lacked "LPT") off truck 55's.
+      const is709gLPTFinance = truck.registration_number !== 'DL1LAJ8588' && (truck.name || '').toLowerCase().includes('709') && ((truck.name || '').toLowerCase().includes('709g') || (truck.name || '').toLowerCase().includes('709 g')) && (truck.name || '').toLowerCase().includes('lpt') && ((truck.name || '').toLowerCase().includes('tata') || truck.manufacturer === 'Tata Motors')
       const is1109gLPTFinance = (truck.name || '').toLowerCase().includes('1109') && (truck.name || '').toLowerCase().includes('lpt') && ((truck.name || '').toLowerCase().includes('tata') || truck.manufacturer === 'Tata Motors')
-      const isAshokLeyland1415Finance = truck.name === 'ASHOK LEYLAND ECOMET STAR 1415 HE'
+      const isAshokLeyland1415Finance = truck.name === 'ASHOK LEYLAND ECOMET STAR 1415 HE' || truck.registration_number === 'UP14LT8731'
       const isEicher2059XPFinance = (truck.name || '').toLowerCase().includes('2059') && ((truck.name || '').toLowerCase().includes('eicher') || (truck.manufacturer === 'Eicher Motors' && (truck.model || '').toLowerCase().includes('2059')))
       const isEicher1075HSDFinance = (truck.name || '').toLowerCase().includes('1075') && ((truck.name || '').toLowerCase().includes('eicher') || (truck.manufacturer === 'Eicher Motors' && (truck.model || '').toLowerCase().includes('1075')))
-      const isMahindraBoleroFinance = truck.name === 'Mahindra Bolero Maxitruck Plus'
+      const isMahindraBoleroFinance = truck.name === 'Mahindra Bolero Maxitruck Plus' || truck.registration_number === 'DL1LAH4925'
       const isSmlIsuzuZT54Finance = (truck.name || '').toLowerCase().includes('zt54') && (truck.name || '').toLowerCase().includes('sml')
       setFinanceAmount(
         isAceGold7908 ? 250000
@@ -929,7 +932,7 @@ export default function TruckDetailsPage() {
   const isTata1512GLPT = truck?.name === 'TATA 1512G LPT' || truck?.name === 'Tata 1512G LPT' || (truck?.name?.includes?.('1512') && truck?.name?.includes?.('LPT') && truck?.name?.toLowerCase().includes?.('tata'))
   const isTata1212LPT = (truck?.name || '').toLowerCase().includes('1212') && (truck?.name || '').toLowerCase().includes('lpt') && (truck?.name || '').toLowerCase().includes('tata')
   const isTata609G = (truck?.name || '').toLowerCase().includes('609') && ((truck?.name || '').toLowerCase().includes('609g') || (truck?.name || '').toLowerCase().includes('609 g')) && ((truck?.name || '').toLowerCase().includes('tata') || truck?.manufacturer === 'Tata Motors')
-  const isTata709gLPT = (truck?.name || '').toLowerCase().includes('709') && ((truck?.name || '').toLowerCase().includes('709g') || (truck?.name || '').toLowerCase().includes('709 g')) && (truck?.name || '').toLowerCase().includes('lpt') && ((truck?.name || '').toLowerCase().includes('tata') || truck?.manufacturer === 'Tata Motors')
+  const isTata709gLPT = truck?.registration_number !== 'DL1LAJ8588' && (truck?.name || '').toLowerCase().includes('709') && ((truck?.name || '').toLowerCase().includes('709g') || (truck?.name || '').toLowerCase().includes('709 g')) && (truck?.name || '').toLowerCase().includes('lpt') && ((truck?.name || '').toLowerCase().includes('tata') || truck?.manufacturer === 'Tata Motors')
   const isTata1109gLPT = (truck?.name || '').toLowerCase().includes('1109') && (truck?.name || '').toLowerCase().includes('lpt') && ((truck?.name || '').toLowerCase().includes('tata') || truck?.manufacturer === 'Tata Motors')
   const isEicherPro2110L = (truck?.name || '').toLowerCase().includes('2110') && ((truck?.name || '').toLowerCase().includes('2110l') || (truck?.model || '').toUpperCase().includes('2110L'))
   const isEicher2059XPTruck = (truck?.name || '').toLowerCase().includes('2059') &&
