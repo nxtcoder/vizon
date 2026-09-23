@@ -39,6 +39,8 @@ type TruckWithNumberPrice = {
   manufactured_on?: string | null
   emission_norm?: string | null
   engine_capacity?: number | null
+  power_steering?: boolean | null
+  mileage_kmpl?: number | null
   gallery?: string[] | null
   videos?: string[] | null
   web_report_url?: string | null
@@ -109,6 +111,8 @@ export async function GET(
           manufactured_on: result.manufactured_on ?? null,
           emission_norm: result.emission_norm ?? null,
           engine_capacity: result.engine_capacity ?? null,
+          power_steering: result.power_steering ?? null,
+          mileage_kmpl: result.mileage_kmpl != null ? Number(result.mileage_kmpl) : null,
           gallery: result.gallery ?? null,
           videos: result.videos ?? null,
           web_report_url: result.web_report_url ?? null,
