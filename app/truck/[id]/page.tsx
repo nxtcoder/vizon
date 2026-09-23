@@ -92,7 +92,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 8, status: 'Good condition', passed: true },
           { name: 'Cargo Bed', score: 8, status: 'Good condition', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -158,7 +157,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 8, status: 'Good condition', passed: true },
           { name: 'Cargo Bed', score: 8, status: 'Good condition', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -224,7 +222,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 7, status: 'Functional, some wear', passed: true },
           { name: 'Cargo Bed', score: 8, status: 'Good condition', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -289,7 +286,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 8, status: 'Good condition', passed: true },
           { name: 'Cargo Bed', score: 7, status: 'Functional, some wear', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -355,7 +351,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 8, status: 'Good condition', passed: true },
           { name: 'Cargo Bed', score: 8, status: 'Good condition', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -421,7 +416,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 8, status: 'Good condition', passed: true },
           { name: 'Cargo Bed', score: 7, status: 'Functional, some wear', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -487,7 +481,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 2,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 7, status: 'Operational, minor issues', passed: true },
           { name: 'Cargo Bed', score: 8, status: 'Good condition', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -554,7 +547,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
         assemblies: 3,
         status: 'Very Good',
         items: [
-          { name: 'Hydraulics', score: 7, status: 'Functional, some wear', passed: true },
           { name: 'Cargo Bed', score: 8, status: 'Good condition', passed: true },
           { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
         ]
@@ -618,7 +610,6 @@ const getInspectionData = (truckName: string | null | undefined) => {
     assemblies: 3,
     status: 'Very Good',
     items: [
-      { name: 'Hydraulics', score: 8, status: 'Good condition', passed: true },
       { name: 'Cargo Bed', score: 7, status: 'Functional, some wear', passed: true },
       { name: 'Tipping Mechanism', score: 7, status: 'Functional, some wear', passed: true },
     ]
