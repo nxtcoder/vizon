@@ -692,7 +692,6 @@ const inspectionDataFromScores = (groups: unknown) => {
 // Truck Highlights
 const truckHighlights = [
   { icon: 'power', label: 'Power Steering', desc: 'Easy maneuvering' },
-  { icon: 'brake', label: 'Air Brakes', desc: 'Superior stopping' },
   { icon: 'fuel', label: 'Fuel Efficient', desc: 'Optimized consumption' },
 ]
 
@@ -701,22 +700,6 @@ const axleratorAdvantages = [
   { title: '200+ Point Check', subtitle: 'Certified quality', color: '#059669' },
   { title: 'RC Transfer', subtitle: 'Hassle-free', color: '#7c3aed' },
   { title: 'Flexi Finance', subtitle: 'Easy EMI', color: '#ea580c' },
-]
-
-// Truck-specific features
-const truckCapabilities = [
-  { name: 'Power Steering', available: true },
-  { name: 'Air Brake System', available: true },
-  { name: 'Sleeper Cabin', available: true },
-  { name: 'Turbo Intercooler', available: true },
-  { name: 'Multi-Speed Gearbox', available: true },
-  { name: 'Tachograph', available: true },
-  { name: 'Roof-Mounted AC', available: true },
-  { name: 'Air Suspension', available: false },
-  { name: 'Telematics Ready', available: true },
-  { name: 'Retarder System', available: false },
-  { name: 'Hill Start Assist', available: true },
-  { name: 'LED Headlamps', available: true },
 ]
 
 export default function TruckDetailsPage() {
@@ -2984,13 +2967,6 @@ export default function TruckDetailsPage() {
                             <path d="M17 7l-5 5-5-5"/>
                           </svg>
                         )}
-                        {h.icon === 'brake' && (
-                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <circle cx="12" cy="12" r="10"/>
-                            <circle cx="12" cy="12" r="4"/>
-                            <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
-                          </svg>
-                        )}
                         {h.icon === 'fuel' && (
                           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                             <path d="M3 22V6a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/>
@@ -3666,13 +3642,6 @@ export default function TruckDetailsPage() {
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.5">
                           <path d="M12 2v10M12 12l8 4M12 12L4 16M12 12v10"/>
                           <path d="M17 7l-5 5-5-5"/>
-                        </svg>
-                      )}
-                      {h.icon === 'brake' && (
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.5">
-                          <circle cx="12" cy="12" r="10"/>
-                          <circle cx="12" cy="12" r="4"/>
-                          <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>
                         </svg>
                       )}
                       {h.icon === 'fuel' && (
