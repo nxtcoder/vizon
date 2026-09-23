@@ -7803,8 +7803,8 @@ body:has(.contact-page) .search-icon,
 
 /* Product Section */
 .td-product {
-  max-width: 100%;
-  margin: 0;
+  max-width: 1320px;
+  margin: 0 auto;
   padding: 2rem;
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 400px);
@@ -7824,7 +7824,8 @@ body:has(.contact-page) .search-icon,
 .td-main-image {
   position: relative;
   width: 100%;
-  aspect-ratio: 16/10;
+  height: auto;
+  aspect-ratio: 4/3;
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
   border-radius: 16px;
   overflow: hidden;
@@ -9838,7 +9839,6 @@ body:has(.contact-page) .search-icon,
   }
 
   .td-main-image {
-    aspect-ratio: 16/9;
     border-radius: 12px;
   }
 
