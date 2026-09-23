@@ -25,5 +25,5 @@ if /i not "%OK%"=="y" exit /b 0
 git commit -m "Updates: Eicher 2059XP single listing, console fix, memory/watch fixes, seed scripts"
 git push -u origin main
 echo.
-echo Done. If push failed, check PUSH_TO_GITHUB.md for login/token steps.
+echo Done. If push failed, check docs\PUSH_TO_GITHUB.md for login/token steps.
 pause
