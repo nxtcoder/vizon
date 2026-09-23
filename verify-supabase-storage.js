@@ -77,7 +77,7 @@ verifyStorage()
       console.log('✅ Storage verification complete!')
     } else {
       console.log('\n⚠️  Storage configuration needs attention.')
-      console.log('   See DEPLOYMENT_IMAGE_FIX.md for instructions.\n')
+      console.log('   See docs/DEPLOYMENT_IMAGE_FIX.md for instructions.\n')
     }
     process.exit(success ? 0 : 1)
   })

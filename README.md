@@ -28,7 +28,7 @@ A modern Next.js application built with TypeScript for a premier truck marketpla
 - PostgreSQL database (local or cloud)
 - EmailJS account (optional, for contact form)
 
-**Development on Windows?** See **[WINDOWS_SETUP.md](./WINDOWS_SETUP.md)** for Git, PATH, env setup with PowerShell, and troubleshooting.
+**Development on Windows?** See **[docs/WINDOWS_SETUP.md](./docs/WINDOWS_SETUP.md)** for Git, PATH, env setup with PowerShell, and troubleshooting.
 
 ## Getting Started
 
