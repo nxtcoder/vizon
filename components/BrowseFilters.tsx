@@ -12,9 +12,19 @@ interface BrowseFiltersProps {
   onClear?: () => void
   /** Brands of the listed trucks; only these are offered. */
   brands: string[]
-  /** States the listed trucks' plates were registered in; only these are offered. */
+  /** States the listed trucks' plates were registered in; always offered first. */
   states: string[]
 }
+
+/** Every state and UT, spelled as `rto_offices.state_name` spells them. */
+const ALL_STATES = [
+  'Andaman and Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar',
+  'Chandigarh', 'Chhattisgarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Goa',
+  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu and Kashmir', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya',
+  'Mizoram', 'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+]
 
 /** Slider stops: 50K, then 1L steps to 15L, 5L to 20L, 10L to 70L. */
 const PRICE_STEPS = [
@@ -53,6 +63,7 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, hasA
   const [selectedOwners, setSelectedOwners] = useState<string[]>([])
   const [selectedStates, setSelectedStates] = useState<string[]>([])
   const [stateSearchQuery, setStateSearchQuery] = useState('')
+  const [showAllStates, setShowAllStates] = useState(false)
 
   // Auto-apply filters whenever any filter value changes
   useEffect(() => {
@@ -109,6 +120,25 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, hasA
   const toggleFuelType = toggle(setSelectedFuelTypes)
   const toggleOwner = toggle(setSelectedOwners)
   const toggleState = toggle(setSelectedStates)
+
+  // States with trucks come first. The rest appear with "Show all states", and
+  // a ticked one stays in view after it is switched off so it can be unticked.
+  const matchesStateSearch = (state: string) =>
+    stateSearchQuery === '' || state.toLowerCase().includes(stateSearchQuery.toLowerCase())
+  const listedStates = states.filter(matchesStateSearch)
+  const otherStates = ALL_STATES.filter(state =>
+    !states.includes(state) && matchesStateSearch(state) &&
+    (showAllStates || selectedStates.includes(state)))
+  const stateOption = (state: string) => (
+    <label key={state} className="filter-checkbox">
+      <input
+        type="checkbox"
+        checked={selectedStates.includes(state)}
+        onChange={() => toggleState(state)}
+      />
+      <span>{state}</span>
+    </label>
+  )
 
   return (
     <div className="browse-filters">
@@ -372,22 +402,23 @@ export default function BrowseFilters({ onFilterChange, totalCars, onClose, hasA
               value={stateSearchQuery}
               onChange={(e) => setStateSearchQuery(e.target.value)}
             />
+            <label className="filter-switch">
+              <span>Show all states</span>
+              <input
+                type="checkbox"
+                role="switch"
+                checked={showAllStates}
+                onChange={() => setShowAllStates(!showAllStates)}
+              />
+            </label>
             <div className="filter-checkboxes">
-              {states
-              .filter(state => 
-                stateSearchQuery === '' || 
-                state.toLowerCase().includes(stateSearchQuery.toLowerCase())
-              )
-              .map(state => (
-                <label key={state} className="filter-checkbox">
-                  <input 
-                    type="checkbox" 
-                    checked={selectedStates.includes(state)}
-                    onChange={() => toggleState(state)}
-                  />
-                  <span>{state}</span>
-                </label>
-              ))}
+              {listedStates.map(stateOption)}
+              {otherStates.length > 0 && (
+                <>
+                  <p className="filter-subheading">Other states</p>
+                  {otherStates.map(stateOption)}
+                </>
+              )}
             </div>
           </div>
         )}
