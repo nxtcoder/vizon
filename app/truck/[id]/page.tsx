@@ -689,9 +689,11 @@ const inspectionDataFromScores = (groups: unknown) => {
   return data
 }
 
-// Truck Highlights
-const truckHighlights = [
-  { icon: 'power', label: 'Power Steering', desc: 'Easy maneuvering' },
+// Truck Highlights. Power Steering comes from the inspection form; a truck
+// with no answer (listed before it was asked) keeps the badge while we test.
+// Fuel Efficient is hardcoded for every truck for now.
+const highlightsFor = (truck: any) => [
+  ...(truck?.power_steering === false ? [] : [{ icon: 'power', label: 'Power Steering', desc: 'Easy maneuvering' }]),
   { icon: 'fuel', label: 'Fuel Efficient', desc: 'Optimized consumption' },
 ]
 
@@ -2802,6 +2804,7 @@ export default function TruckDetailsPage() {
                     { label: 'Odometer', value: odometerValue },
                     { label: 'Power', value: powerValue },
                     ...(truck.engine_capacity && !(isSmlIsuzuZT54 && smlIsuzuZT54Display) ? [{ label: 'Engine', value: `${Number(truck.engine_capacity).toLocaleString('en-IN')} cc` }] : []),
+                    ...(truck.mileage_kmpl ? [{ label: 'Mileage', value: `${truck.mileage_kmpl} ${truck.fuel_type === 'CNG' ? 'km/kg' : 'km/l'}` }] : []),
                     { label: 'Gearbox', value: gearboxValue },
                     { label: 'RTO', value: rtoValue },
                     { label: 'Insurance', value: insuranceValue },
@@ -2952,7 +2955,7 @@ export default function TruckDetailsPage() {
               <div className="td-highlights">
                 <h4 className="td-highlights-label">HIGHLIGHTS</h4>
                 <div className="td-highlights-grid">
-                  {truckHighlights.map((h, idx) => (
+                  {highlightsFor(truck).map((h, idx) => (
                     <div key={idx} className="td-highlight-item">
                       <div className="td-highlight-icon">
                         {h.icon === 'power' && (
@@ -3629,7 +3632,7 @@ export default function TruckDetailsPage() {
             <div className="td-report-modal-content">
               <h4 className="td-modal-highlights-title">HIGHLIGHTS</h4>
               <div className="td-modal-highlights">
-                {truckHighlights.map((h, idx) => (
+                {highlightsFor(truck).map((h, idx) => (
                   <div key={idx} className="td-modal-highlight">
                     <div className="td-modal-highlight-icon">
                       {h.icon === 'power' && (
