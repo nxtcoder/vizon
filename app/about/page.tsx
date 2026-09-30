@@ -1,7 +1,21 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Eye, ShieldCheck, Zap, Handshake, Truck, Store, Route, MapPin } from 'lucide-react'
+import {
+  Eye,
+  ShieldCheck,
+  Zap,
+  Handshake,
+  Truck,
+  Store,
+  Route,
+  MapPin,
+  Search,
+  Network,
+  Rocket,
+  MonitorSmartphone,
+  BadgeCheck,
+} from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import './about.css'
@@ -21,22 +35,32 @@ const metrics = [
 
 const journey = [
   {
+    Icon: Search,
+    period: 'Q1 2025',
     title: 'The Beginning',
     text: 'Identified the core fragmentation and lack of trust in the second-hand commercial vehicle market.',
   },
   {
+    Icon: ShieldCheck,
+    period: 'Q3 2025',
     title: 'Developing the Trust Seal',
     text: 'Engineered our rigorous multi-point technical inspection and legal verification protocol.',
   },
   {
+    Icon: Network,
+    period: 'Q1 2026',
     title: 'Expanding the Ecosystem',
     text: 'Launched operations as an agile aggregator, proving the market demand for verified, 1-10 condition-rated inventory.',
   },
   {
+    Icon: MapPin,
+    period: 'Q3 2026',
     title: 'Regional Dominance',
     text: 'Scaled our operational footprint to establish comprehensive coverage and rapid fulfillment across the critical Delhi and Delhi NCR logistics corridors.',
   },
   {
+    Icon: Rocket,
+    period: 'Q1 2027',
     title: 'The Future',
     text: 'Scaling our dynamic bidding platform and expanding our robust digital network of official channel partners nationwide.',
   },
@@ -44,14 +68,20 @@ const journey = [
 
 const pillars = [
   {
+    Icon: MonitorSmartphone,
+    tone: 'navy',
     title: 'Axlerator Digital',
     text: 'The premier online marketplace for buying and selling verified commercial vehicles with complete transparency.',
   },
   {
+    Icon: Handshake,
+    tone: 'red',
     title: 'Axlerator Partner Network',
     text: 'Our exclusive, vetted alliance of top-tier logistics companies and official dealer partners, guaranteeing high-quality supply and immediate demand matching.',
   },
   {
+    Icon: BadgeCheck,
+    tone: 'gold',
     title: 'Axlerator Trust Seal',
     text: 'Our proprietary inspection division handling mechanical scoring, 1-10 condition ratings, and comprehensive legal background checks.',
   },
@@ -76,12 +106,14 @@ const founders = [
     name: 'Ankur',
     role: 'Co-Founder',
     photo: '/team/ankur.jpg',
+    linkedin: 'https://www.linkedin.com/in/ankur-kumar-6110761a0/',
     bio: 'Driving the strategic vision and operational execution, Ankur focuses on scaling Axlerator’s market footprint. He is the architect behind Axlerator’s robust network of official dealer and logistics channel partners, ensuring seamless supply chain integration and rapid expansion across the Delhi NCR region and beyond.',
   },
   {
     name: 'Raunak',
     role: 'Co-Founder',
     photo: '/team/raunak.jpg',
+    linkedin: 'https://www.linkedin.com/in/raunak-chaudhary-01158a201/',
     bio: 'Spearheading the technology, product, and verification ecosystem, Raunak ensures the Axlerator Trust Seal is backed by unyielding data and a frictionless digital platform. His focus is on translating complex mechanical and legal data into intuitive, actionable insights that empower fleet owners to make profitable decisions.',
   },
 ]
@@ -95,6 +127,24 @@ const values = [
 
 const legalChecks = ['RC & ownership', 'Hypothecation', 'Challans', 'Insurance', 'Blacklist status']
 
+// same mark as the footer's LinkedIn link
+function LinkedInIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+    </svg>
+  )
+}
+
+function SectionHead({ tag, title }: { tag: string; title: string }) {
+  return (
+    <div className="ab-head">
+      <span className="ab-tag">{tag}</span>
+      <h2 className="ab-title">{title}</h2>
+    </div>
+  )
+}
+
 function TrustSeal({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 200 200" role="img" aria-label="Axlerator Trust Seal">
@@ -102,8 +152,8 @@ function TrustSeal({ className }: { className?: string }) {
         <path id="ab-seal-ring" d="M100 100 m-72 0 a72 72 0 1 1 144 0 a72 72 0 1 1 -144 0" />
       </defs>
       <circle cx="100" cy="100" r="94" fill="none" stroke="#EAA927" strokeWidth="3" />
-      <circle cx="100" cy="100" r="86" fill="#030303" fillOpacity="0.75" stroke="#EAA927" strokeWidth="1" strokeDasharray="2 4" />
-      <text fill="#EAA927" fontSize="13" fontWeight="600" letterSpacing="3.2">
+      <circle cx="100" cy="100" r="86" fill="#FFFFFF" stroke="#EAA927" strokeWidth="1" strokeDasharray="2 4" />
+      <text fill="#A86F00" fontSize="13" fontWeight="600" letterSpacing="3.2">
         <textPath href="#ab-seal-ring">AXLERATOR • TRUST SEAL • VERIFIED •</textPath>
       </text>
       <circle cx="100" cy="100" r="48" fill="#EAA927" />
@@ -183,30 +233,21 @@ export default function AboutPage() {
 
       {/* Hero */}
       <section className="ab-hero">
-        <div className="ab-container ab-hero-grid">
-          <div className="ab-hero-copy">
-            <span className="ab-hero-kicker">About Axlerator</span>
-            <h1 className="ab-hero-title">
-              India&apos;s Most Trusted Digital Marketplace for Commercial Vehicles.
-            </h1>
-            <p className="ab-hero-sub">
-              We don&apos;t just sell second-hand trucks. We sell data-driven trust, rigorous verification,
-              and peace of mind for fleet owners and independent drivers. Welcome to the new standard for
-              commercial mobility.
-            </p>
-          </div>
-          <div className="ab-hero-media">
-            <div className="ab-hero-photo">
-              <Image
-                src="/about-hero.jpg"
-                alt="Commercial truck on the road"
-                fill
-                priority
-                sizes="(max-width: 960px) 100vw, 560px"
-              />
-            </div>
-            <TrustSeal className="ab-hero-seal" />
-          </div>
+        <div className="ab-hero-bg">
+          <Image src="/about-hero.jpg" alt="Commercial truck on the road" fill priority sizes="100vw" />
+        </div>
+        <div className="ab-hero-fade" />
+        <TrustSeal className="ab-hero-seal" />
+        <div className="ab-container ab-hero-copy">
+          <span className="ab-hero-kicker">About Axlerator</span>
+          <h1 className="ab-hero-title">
+            India&apos;s Most Trusted Digital Marketplace for Commercial Vehicles.
+          </h1>
+          <p className="ab-hero-sub">
+            We don&apos;t just sell second-hand trucks. We sell data-driven trust, rigorous verification,
+            and peace of mind for fleet owners and independent drivers. Welcome to the new standard for
+            commercial mobility.
+          </p>
         </div>
       </section>
 
@@ -214,6 +255,7 @@ export default function AboutPage() {
       <section className="ab-section">
         <div className="ab-container ab-split">
           <div className="ab-split-copy">
+            <span className="ab-tag ab-tag-red">Who we are</span>
             <h2 className="ab-subhead ab-red">The Broken Market</h2>
             <p>
               Buying a second-hand commercial vehicle has traditionally been a gamble. The market is
@@ -234,9 +276,9 @@ export default function AboutPage() {
       </section>
 
       {/* Impact metrics */}
-      <section className="ab-band">
+      <section className="ab-section ab-tint">
         <div className="ab-container">
-          <h2 className="ab-title">Impact in Numbers</h2>
+          <SectionHead tag="Scale & trust" title="Impact in Numbers" />
           <div className="ab-metrics">
             {metrics.map(({ value, label, Icon }) => (
               <div key={label} className="ab-metric">
@@ -254,12 +296,15 @@ export default function AboutPage() {
       {/* Journey */}
       <section className="ab-section">
         <div className="ab-container">
-          <h2 className="ab-title">Our Journey</h2>
+          <SectionHead tag="Milestones" title="Our Journey" />
           <ol className="ab-timeline">
-            {journey.map((step, i) => (
+            {journey.map(({ Icon, ...step }) => (
               <li key={step.title} className="ab-timeline-item">
+                <span className="ab-timeline-node" aria-hidden="true">
+                  <Icon size={20} />
+                </span>
                 <div className="ab-timeline-card">
-                  <span className="ab-timeline-step">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="ab-timeline-step">{step.period}</span>
                   <h3>{step.title}</h3>
                   <p>{step.text}</p>
                 </div>
@@ -270,17 +315,29 @@ export default function AboutPage() {
       </section>
 
       {/* Engine & ecosystem */}
-      <section className="ab-section ab-section-tight">
+      <section className="ab-section ab-band">
         <div className="ab-container">
-          <h2 className="ab-title">The Engine &amp; Ecosystem</h2>
+          <SectionHead tag="The ecosystem" title="The Engine & Ecosystem" />
           <div className="ab-pillars">
-            {pillars.map((p) => (
-              <article key={p.title} className="ab-pillar">
-                <h3>{p.title}</h3>
-                <p>{p.text}</p>
+            {pillars.map(({ Icon, tone, title, text }) => (
+              <article key={title} className="ab-pillar">
+                <div className="ab-pillar-head">
+                  <span className={`ab-pillar-icon ab-tone-${tone}`}>
+                    <Icon size={22} aria-hidden="true" />
+                  </span>
+                  <h3>{title}</h3>
+                </div>
+                <p>{text}</p>
               </article>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Partner brands */}
+      <section className="ab-section ab-tint ab-section-tight">
+        <div className="ab-container">
+          <SectionHead tag="Trusted by" title="OEM Partner Brands" />
         </div>
         <div className="ab-partners" aria-label="OEM partner brands">
           <div className="ab-partners-track">
@@ -309,29 +366,54 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Leadership & values */}
+      {/* Leadership */}
       <section className="ab-section">
         <div className="ab-container">
-          <h2 className="ab-title">Leadership Team</h2>
+          <SectionHead tag="Leadership" title="Leadership Team" />
           <div className="ab-founders">
             {founders.map((f) => (
               <div key={f.name} className="ab-founder">
                 <div className="ab-founder-photo">
-                  <Image src={f.photo} alt={`${f.name}, ${f.role}`} width={180} height={180} />
+                  <Image src={f.photo} alt={`${f.name}, ${f.role}`} width={220} height={220} />
                 </div>
                 <h3>{f.name}</h3>
                 <span className="ab-founder-role">{f.role}</span>
+                <a
+                  href={f.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ab-founder-linkedin"
+                  aria-label={`${f.name} on LinkedIn`}
+                >
+                  <LinkedInIcon />
+                </a>
                 <p>{f.bio}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
 
-          <h2 className="ab-title ab-values-title">Core Values</h2>
+      {/* Values */}
+      <section className="ab-section ab-band">
+        <div className="ab-container">
+          <SectionHead tag="What drives us" title="Our Core Values" />
           <div className="ab-values">
+            {/* dashed zigzag joining the staggered icons (desktop only) */}
+            <svg className="ab-values-link" viewBox="0 0 100 160" preserveAspectRatio="none" aria-hidden="true">
+              <polyline
+                points="12.5,48 37.5,112 62.5,48 87.5,112"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeDasharray="6 6"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
             {values.map(({ title, text, Icon }) => (
               <div key={title} className="ab-value">
                 <div className="ab-value-icon">
-                  <Icon size={28} aria-hidden="true" />
+                  <Icon size={34} aria-hidden="true" />
                 </div>
                 <h3>{title}</h3>
                 <p>{text}</p>
