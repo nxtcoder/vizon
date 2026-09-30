@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Eye, ShieldCheck, Zap, Handshake } from 'lucide-react'
+import { Eye, ShieldCheck, Zap, Handshake, Truck, Store, Route, MapPin } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import './about.css'
@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 }
 
 const metrics = [
-  { value: '50+', label: 'Verified Inventory' },
-  { value: '7', label: 'Official Dealer Partners' },
-  { value: '8', label: 'Official Logistics Partners' },
-  { value: 'Delhi & NCR', label: 'Serving Delhi & Delhi NCR' },
+  { value: '50+', label: 'Verified Inventory', Icon: Truck },
+  { value: '7', label: 'Official Dealer Partners', Icon: Store },
+  { value: '8', label: 'Official Logistics Partners', Icon: Route },
+  { value: 'Delhi NCR', label: 'Serving Delhi & Delhi NCR', Icon: MapPin },
 ]
 
 const journey = [
@@ -66,6 +66,10 @@ const partners: { name: string; logo?: string; scale?: number }[] = [
   { name: 'Mahindra', logo: '/logos/Mahindra.svg', scale: 1.8 },
   { name: 'BharatBenz' },
 ]
+
+// Five logos are narrower than a wide screen, so each group repeats them
+// enough times to always overflow the viewport.
+const partnerLoop = [...partners, ...partners, ...partners]
 
 const founders = [
   {
@@ -121,13 +125,13 @@ function InspectionGraphic() {
       </div>
 
       <svg className="ab-inspect-truck" viewBox="0 0 420 200" aria-hidden="true">
-        <g fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="2" strokeLinejoin="round">
+        <g fill="none" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2" strokeLinejoin="round">
           {/* cargo body */}
           <rect x="20" y="30" width="240" height="110" rx="4" />
-          <path d="M40 30v110M80 30v110M120 30v110M160 30v110M200 30v110M240 30v110" stroke="rgba(255,255,255,0.12)" />
+          <path d="M40 30v110M80 30v110M120 30v110M160 30v110M200 30v110M240 30v110" strokeOpacity="0.15" />
           {/* cab */}
           <path d="M268 60h70l42 42v38H268z" />
-          <path d="M290 72h44l30 30h-74z" stroke="rgba(255,255,255,0.35)" />
+          <path d="M290 72h44l30 30h-74z" strokeOpacity="0.4" />
           {/* chassis */}
           <path d="M20 148h380" />
           {/* wheels */}
@@ -154,7 +158,7 @@ function InspectionGraphic() {
           </g>
         ))}
         <path d="M328 125 L328 20 L300 20" stroke="#EAA927" strokeWidth="1" fill="none" />
-        <text x="296" y="24" fill="#EAA927" fontSize="11" fontWeight="600" textAnchor="end" letterSpacing="1">
+        <text x="296" y="24" fill="#A86F00" fontSize="11" fontWeight="600" textAnchor="end" letterSpacing="1">
           TECHNICAL INSPECTION
         </text>
       </svg>
@@ -179,18 +183,30 @@ export default function AboutPage() {
 
       {/* Hero */}
       <section className="ab-hero">
-        <Image src="/heroimage2.png" alt="" fill priority sizes="100vw" className="ab-hero-bg" />
-        <div className="ab-hero-shade" />
-        <div className="ab-hero-inner">
-          <TrustSeal className="ab-hero-seal" />
-          <h1 className="ab-hero-title">
-            India&apos;s Most Trusted Digital Marketplace for Commercial Vehicles.
-          </h1>
-          <p className="ab-hero-sub">
-            We don&apos;t just sell second-hand trucks. We sell data-driven trust, rigorous verification,
-            and peace of mind for fleet owners and independent drivers. Welcome to the new standard for
-            commercial mobility.
-          </p>
+        <div className="ab-container ab-hero-grid">
+          <div className="ab-hero-copy">
+            <span className="ab-hero-kicker">About Axlerator</span>
+            <h1 className="ab-hero-title">
+              India&apos;s Most Trusted Digital Marketplace for Commercial Vehicles.
+            </h1>
+            <p className="ab-hero-sub">
+              We don&apos;t just sell second-hand trucks. We sell data-driven trust, rigorous verification,
+              and peace of mind for fleet owners and independent drivers. Welcome to the new standard for
+              commercial mobility.
+            </p>
+          </div>
+          <div className="ab-hero-media">
+            <div className="ab-hero-photo">
+              <Image
+                src="/about-hero.jpg"
+                alt="Commercial truck on the road"
+                fill
+                priority
+                sizes="(max-width: 960px) 100vw, 560px"
+              />
+            </div>
+            <TrustSeal className="ab-hero-seal" />
+          </div>
         </div>
       </section>
 
@@ -222,10 +238,13 @@ export default function AboutPage() {
         <div className="ab-container">
           <h2 className="ab-title">Impact in Numbers</h2>
           <div className="ab-metrics">
-            {metrics.map((m) => (
-              <div key={m.label} className="ab-metric">
-                <span className="ab-metric-value">{m.value}</span>
-                <span className="ab-metric-label">{m.label}</span>
+            {metrics.map(({ value, label, Icon }) => (
+              <div key={label} className="ab-metric">
+                <span className="ab-metric-icon">
+                  <Icon size={22} aria-hidden="true" />
+                </span>
+                <span className="ab-metric-value">{value}</span>
+                <span className="ab-metric-label">{label}</span>
               </div>
             ))}
           </div>
@@ -265,20 +284,25 @@ export default function AboutPage() {
         </div>
         <div className="ab-partners" aria-label="OEM partner brands">
           <div className="ab-partners-track">
-            {[...partners, ...partners].map((p, i) => (
-              <div key={i} className="ab-partner" aria-hidden={i >= partners.length}>
-                {p.logo ? (
-                  <Image
-                    src={p.logo}
-                    alt={p.name}
-                    width={140}
-                    height={48}
-                    className="ab-partner-logo"
-                    style={{ transform: `scale(${p.scale ?? 1})` }}
-                  />
-                ) : (
-                  <span className="ab-partner-word">{p.name}</span>
-                )}
+            {/* two identical groups: the track slides by exactly one group, then loops */}
+            {[0, 1].map((group) => (
+              <div key={group} className="ab-partners-group" aria-hidden={group === 1}>
+                {partnerLoop.map((p, i) => (
+                  <div key={i} className="ab-partner">
+                    {p.logo ? (
+                      <Image
+                        src={p.logo}
+                        alt={group === 0 && i < partners.length ? p.name : ''}
+                        width={140}
+                        height={48}
+                        className="ab-partner-logo"
+                        style={{ transform: `scale(${p.scale ?? 1})` }}
+                      />
+                    ) : (
+                      <span className="ab-partner-word">{p.name}</span>
+                    )}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
