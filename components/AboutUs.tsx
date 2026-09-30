@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function AboutUs() {
   return (
@@ -40,9 +41,9 @@ export default function AboutUs() {
               understands the critical role commercial vehicles play in your success.
             </p>
 
-            <button className="about-us-cta">
+            <Link href="/about" className="about-us-cta">
               Learn More About Us
-            </button>
+            </Link>
           </div>
         </div>
       </div>

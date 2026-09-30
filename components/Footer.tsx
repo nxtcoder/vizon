@@ -38,12 +38,12 @@ export default function Footer() {
             <h3 className="footer-heading">Quick Links</h3>
             <ul className="footer-links">
               <li>
-                <Link href="#about" className="footer-link">
+                <Link href="/about" className="footer-link">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="#contact" className="footer-link">
+                <Link href="/#contact" className="footer-link">
                   Contact Us
                 </Link>
               </li>

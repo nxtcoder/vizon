@@ -314,6 +314,17 @@ const searchSuggestions = [
             )}
           </li>
 
+          {/* About Us - simple link */}
+          <li className="nav-item">
+            <Link 
+              href="/about" 
+              className={`nav-link ${pathname === '/about' ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              About Us
+            </Link>
+          </li>
+
           {/* Our Services - simple link */}
           <li className="nav-item">
             <a 

@@ -10,16 +10,6 @@ export default function ServicesPage() {
       <Navbar />
       
       <div className="services-container">
-        {/* About Us Section */}
-        <section className="hero-statement-section">
-          <div className="hero-statement-content">
-            <h1 className="about-us-title">About Us</h1>
-            <p className="hero-statement-text">
-              At Axlerator, we are rewriting the rules of trust in India&apos;s pre-owned commercial vehicle ecosystem. Born from the firsthand frustrations of fragmented buying experiences, hidden faults, and opaque pricing, we envisioned a platform where every transaction is grounded in transparency, data, and end-to-end accountability. We are not just a marketplace, we are a full-stack re-commerce partner for businesses, fleet owners, and transporters who believe that reliability shouldn&apos;t be a luxury.
-            </p>
-            </div>
-        </section>
-
         {/* Mission Section */}
         <section className="mission-section">
           <div className="mission-content">

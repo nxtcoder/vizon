@@ -10,7 +10,7 @@ export default function ContactUs() {
   }
 
   return (
-    <section className="contact-us-section">
+    <section className="contact-us-section" id="contact">
       <div className="contact-us-container">
         <div className="contact-us-header">
           <h2 className="contact-us-title">Let&apos;s collaborate</h2>
