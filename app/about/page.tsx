@@ -174,41 +174,50 @@ function InspectionGraphic() {
         </div>
       </div>
 
-      <svg className="ab-inspect-truck" viewBox="0 0 420 200" aria-hidden="true">
+      <svg className="ab-inspect-truck" viewBox="0 0 390 180" aria-hidden="true">
         <g fill="none" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2" strokeLinejoin="round">
           {/* cargo body */}
-          <rect x="20" y="30" width="240" height="110" rx="4" />
-          <path d="M40 30v110M80 30v110M120 30v110M160 30v110M200 30v110M240 30v110" strokeOpacity="0.15" />
-          {/* cab */}
-          <path d="M268 60h70l42 42v38H268z" />
-          <path d="M290 72h44l30 30h-74z" strokeOpacity="0.4" />
-          {/* chassis */}
-          <path d="M20 148h380" />
-          {/* wheels */}
-          <circle cx="80" cy="160" r="22" />
-          <circle cx="80" cy="160" r="8" />
-          <circle cx="140" cy="160" r="22" />
-          <circle cx="140" cy="160" r="8" />
-          <circle cx="330" cy="160" r="22" />
-          <circle cx="330" cy="160" r="8" />
+          <rect x="20" y="28" width="236" height="104" rx="4" />
+          <path d="M60 28v104M100 28v104M140 28v104M180 28v104M220 28v104" strokeOpacity="0.15" />
+          {/* cab-over cab: tall, near-upright front with a rounded roof edge */}
+          <path d="M264 40H334Q350 40 352 56L358 132H264Z" />
+          {/* windscreen, door line, bumper */}
+          <path d="M296 52H336Q343 52 344 60L347 88H296Z" strokeOpacity="0.4" />
+          <path d="M290 94V130" strokeOpacity="0.3" />
+          <path d="M354 120H366V132H356" />
+          {/* chassis rail */}
+          <path d="M20 138H366" />
         </g>
+        {/* wheels sit just under the body; the solid fill hides the rail behind them */}
+        <g fill="#ffffff" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2">
+          <circle cx="78" cy="153" r="20" />
+          <circle cx="132" cy="153" r="20" />
+          <circle cx="322" cy="153" r="20" />
+        </g>
+        <g fill="none" stroke="currentColor" strokeOpacity="0.7" strokeWidth="2">
+          <circle cx="78" cy="153" r="7" />
+          <circle cx="132" cy="153" r="7" />
+          <circle cx="322" cy="153" r="7" />
+        </g>
+        {/* headlamp */}
+        <rect x="347" y="100" width="8" height="8" rx="2" fill="currentColor" fillOpacity="0.35" />
         {/* engine block under the cab */}
-        <rect x="300" y="112" width="56" height="26" rx="3" fill="rgba(234,169,39,0.12)" stroke="#EAA927" strokeWidth="1.5" strokeDasharray="4 3" />
-        {/* inspection nodes */}
+        <rect x="296" y="98" width="48" height="28" rx="3" fill="rgba(234,169,39,0.12)" stroke="#EAA927" strokeWidth="1.5" strokeDasharray="4 3" />
+        {/* inspection nodes: engine, wheel hubs, headlamp */}
         {[
-          [328, 125],
-          [80, 160],
-          [330, 160],
-          [372, 110],
-          [140, 160],
+          [320, 112],
+          [78, 153],
+          [132, 153],
+          [322, 153],
+          [351, 104],
         ].map(([cx, cy], i) => (
           <g key={i}>
             <circle cx={cx} cy={cy} r="11" fill="rgba(234,169,39,0.18)" className="ab-node-pulse" />
             <circle cx={cx} cy={cy} r="4.5" fill="#EAA927" />
           </g>
         ))}
-        <path d="M328 125 L328 20 L300 20" stroke="#EAA927" strokeWidth="1" fill="none" />
-        <text x="296" y="24" fill="#A86F00" fontSize="11" fontWeight="600" textAnchor="end" letterSpacing="1">
+        <path d="M320 112 L320 18 L292 18" stroke="#EAA927" strokeWidth="1" fill="none" />
+        <text x="288" y="22" fill="#A86F00" fontSize="11" fontWeight="600" textAnchor="end" letterSpacing="1">
           TECHNICAL INSPECTION
         </text>
       </svg>
