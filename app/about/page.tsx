@@ -153,8 +153,11 @@ function TrustSeal({ className }: { className?: string }) {
       </defs>
       <circle cx="100" cy="100" r="94" fill="none" stroke="#EAA927" strokeWidth="3" />
       <circle cx="100" cy="100" r="86" fill="#FFFFFF" stroke="#EAA927" strokeWidth="1" strokeDasharray="2 4" />
-      <text fill="#A86F00" fontSize="13" fontWeight="600" letterSpacing="3.2">
-        <textPath href="#ab-seal-ring">AXLERATOR • TRUST SEAL • VERIFIED •</textPath>
+      <text fill="#A86F00" fontSize="13" fontWeight="600">
+        {/* textLength = ring circumference (2π × 72), so the gaps are equal all the way round */}
+        <textPath href="#ab-seal-ring" textLength="452" lengthAdjust="spacing">
+          AXLERATOR • TRUST SEAL • VERIFIED •{'\u00a0'}
+        </textPath>
       </text>
       <circle cx="100" cy="100" r="48" fill="#EAA927" />
       <path d="M78 101 l15 15 l30 -32" fill="none" stroke="#030303" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
@@ -179,12 +182,13 @@ function InspectionGraphic() {
           {/* cargo body */}
           <rect x="20" y="28" width="236" height="104" rx="4" />
           <path d="M60 28v104M100 28v104M140 28v104M180 28v104M220 28v104" strokeOpacity="0.15" />
-          {/* cab-over cab: tall, near-upright front with a rounded roof edge */}
-          <path d="M264 40H334Q350 40 352 56L358 132H264Z" />
-          {/* windscreen, door line, bumper */}
-          <path d="M296 52H336Q343 52 344 60L347 88H296Z" strokeOpacity="0.4" />
-          <path d="M290 94V130" strokeOpacity="0.3" />
-          <path d="M354 120H366V132H356" />
+          {/* cab-over cab: upright front with a rounded roof edge */}
+          <path d="M264 40H332Q354 40 354 62V132H264Z" />
+          {/* side window and door line */}
+          <path d="M320 52H334Q342 52 342 60V86H320Z" strokeOpacity="0.4" />
+          <path d="M284 52V128" strokeOpacity="0.3" />
+          {/* bumper, flush against the cab front (open on the cab side so no line doubles up) */}
+          <path d="M354 118H362Q366 118 366 122V132H354" />
           {/* chassis rail */}
           <path d="M20 138H366" />
         </g>
@@ -199,24 +203,25 @@ function InspectionGraphic() {
           <circle cx="132" cy="153" r="7" />
           <circle cx="322" cy="153" r="7" />
         </g>
-        {/* headlamp */}
-        <rect x="347" y="100" width="8" height="8" rx="2" fill="currentColor" fillOpacity="0.35" />
+        {/* headlamp, inside the cab front */}
+        <rect x="343" y="100" width="7" height="8" rx="2" fill="currentColor" fillOpacity="0.35" />
         {/* engine block under the cab */}
-        <rect x="296" y="98" width="48" height="28" rx="3" fill="rgba(234,169,39,0.12)" stroke="#EAA927" strokeWidth="1.5" strokeDasharray="4 3" />
+        <rect x="292" y="98" width="40" height="28" rx="3" fill="rgba(234,169,39,0.12)" stroke="#EAA927" strokeWidth="1.5" strokeDasharray="4 3" />
         {/* inspection nodes: engine, wheel hubs, headlamp */}
         {[
-          [320, 112],
+          [312, 112],
           [78, 153],
           [132, 153],
           [322, 153],
-          [351, 104],
+          [346.5, 104],
         ].map(([cx, cy], i) => (
           <g key={i}>
             <circle cx={cx} cy={cy} r="11" fill="rgba(234,169,39,0.18)" className="ab-node-pulse" />
             <circle cx={cx} cy={cy} r="4.5" fill="#EAA927" />
           </g>
         ))}
-        <path d="M320 112 L320 18 L292 18" stroke="#EAA927" strokeWidth="1" fill="none" />
+        {/* pointer leaves the top of the engine box and passes left of the window */}
+        <path d="M312 98V18H292" stroke="#EAA927" strokeWidth="1" fill="none" />
         <text x="288" y="22" fill="#A86F00" fontSize="11" fontWeight="600" textAnchor="end" letterSpacing="1">
           TECHNICAL INSPECTION
         </text>
@@ -346,9 +351,9 @@ export default function AboutPage() {
       {/* Partner brands */}
       <section className="ab-section ab-tint ab-section-tight">
         <div className="ab-container">
-          <SectionHead tag="Trusted by" title="OEM Partner Brands" />
+          <SectionHead tag="Brands we sell" title="Trucks From India's Leading Makers" />
         </div>
-        <div className="ab-partners" aria-label="OEM partner brands">
+        <div className="ab-partners" aria-label="Truck brands we sell">
           <div className="ab-partners-track">
             {/* two identical groups: the track slides by exactly one group, then loops */}
             {[0, 1].map((group) => (
