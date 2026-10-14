@@ -22,6 +22,7 @@ const emails = [
 ]
 
 const directionsUrl = 'https://www.google.com/maps/search/?api=1&query=Rohini+Sector+16+New+Delhi'
+const mapEmbedUrl = 'https://www.google.com/maps?q=Rohini+Sector+16+New+Delhi&output=embed'
 
 export default function ContactPage() {
   return (
@@ -98,6 +99,23 @@ export default function ContactPage() {
           </div>
 
           <ContactForm />
+        </div>
+      </section>
+
+      <section className="ct-map-section">
+        <div className="ct-container">
+          <div className="ct-map-head">
+            <span className="ct-tag">Location</span>
+            <h2 className="ct-subhead">Find our office</h2>
+          </div>
+          <div className="ct-map">
+            <iframe
+              title="Map of the Axlerator office in Rohini Sector-16, New Delhi"
+              src={mapEmbedUrl}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
       </section>
 
