@@ -516,6 +516,17 @@ body {
 }
 
 /* Responsive Design */
+/* Between the hamburger breakpoint and the width where the six links fit at full size, tighten the pills so the bar doesn't overflow */
+@media screen and (min-width: 769px) and (max-width: 1200px) {
+  .nav-menu {
+    gap: 0.5rem;
+  }
+
+  .nav-link {
+    padding: 0.6rem 0.9rem;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .hamburger {
     display: flex;

@@ -335,6 +335,17 @@ const searchSuggestions = [
             </a>
           </li>
 
+          {/* Contact Us - simple link */}
+          <li className="nav-item">
+            <Link
+              href="/contact"
+              className={`nav-link ${pathname === '/contact' ? 'active' : ''}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Contact Us
+            </Link>
+          </li>
+
           {/* Get Started - CTA button */}
           <li className="nav-item">
             <a 
