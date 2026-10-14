@@ -1,0 +1,330 @@
+/* Contact page. Same tokens and patterns as the About page, under the ct- prefix so the two stylesheets stay independent. */
+.ct-page {
+  --ct-band: #f8fafc;
+  --ct-line: #e2e8f0;
+  --ct-text: #1e293b;
+  --ct-muted: #475569;
+  --ct-red: #ae0002;
+  --ct-gold: #eaa927;
+  --ct-gold-ink: #a86f00;
+  --ct-navy: #1e293b;
+  --ct-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* solid offset shadow for the bold button */
+  --ct-hard-shadow: 4px 4px 0 var(--ct-navy);
+
+  background: #ffffff;
+  color: var(--ct-text);
+  min-height: 100vh;
+}
+
+.ct-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header: cream band with the brand kicker, like the About hero */
+.ct-hero {
+  background: rgb(255, 245, 222);
+  border-bottom: 1px solid #f6e3bd;
+  padding: 8rem 0 4.5rem;
+  text-align: center;
+}
+
+.ct-kicker {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ct-red);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(174, 0, 2, 0.25);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  margin-bottom: 1.25rem;
+}
+
+.ct-hero-title {
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  margin-bottom: 1.25rem;
+}
+
+.ct-hero-sub {
+  max-width: 620px;
+  margin: 0 auto;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  line-height: 1.75;
+  color: #334155;
+}
+
+/* Main: channel cards on the left, enquiry form on the right */
+.ct-section {
+  padding: 5rem 0 6rem;
+}
+
+.ct-split {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 3.5rem;
+  align-items: start;
+}
+
+.ct-subhead {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.75rem;
+}
+
+.ct-intro {
+  color: var(--ct-muted);
+  line-height: 1.75;
+  margin-bottom: 2rem;
+}
+
+.ct-channels {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ct-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 1.5rem 1.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ct-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+}
+
+.ct-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 0.35rem;
+}
+
+.ct-card-icon {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+.ct-tone-navy { background: var(--ct-navy); }
+.ct-tone-red { background: var(--ct-red); }
+.ct-tone-gold { background: var(--ct-gold); color: #0f172a; }
+
+.ct-line {
+  display: block;
+  color: var(--ct-text);
+  font-weight: 500;
+  line-height: 1.6;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+a.ct-line:hover {
+  color: var(--ct-red);
+}
+
+.ct-person {
+  margin-top: 0.4rem;
+}
+
+.ct-person-name {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--ct-muted);
+}
+
+.ct-directions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--ct-red);
+  text-decoration: none;
+}
+
+.ct-directions:hover {
+  text-decoration: underline;
+}
+
+/* Enquiry form */
+.ct-form {
+  background: #ffffff;
+  border: 1px solid var(--ct-line);
+  border-radius: 16px;
+  padding: 2.25rem;
+  box-shadow: var(--ct-shadow);
+}
+
+.ct-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ct-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.ct-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.ct-field label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ct-text);
+}
+
+.ct-field input,
+.ct-field select,
+.ct-field textarea {
+  width: 100%;
+  font: inherit;
+  /* 1rem keeps iOS from zooming on focus */
+  font-size: 1rem;
+  color: var(--ct-text);
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.75rem 0.9rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ct-field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%231e293b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.4rem;
+}
+
+.ct-field textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.ct-field input:focus,
+.ct-field select:focus,
+.ct-field textarea:focus {
+  outline: none;
+  border-color: var(--ct-navy);
+  box-shadow: 0 0 0 3px rgba(234, 169, 39, 0.35);
+}
+
+/* Same bold button as the About page CTA */
+.ct-submit {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--ct-gold);
+  color: #030303;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  border: 2px solid var(--ct-navy);
+  box-shadow: var(--ct-hard-shadow);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.ct-submit:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--ct-navy);
+}
+
+.ct-submit:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+/* Tablet */
+@media (max-width: 960px) {
+  .ct-split {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+}
+
+/* Phone */
+@media (max-width: 640px) {
+  .ct-container {
+    padding: 0 1rem;
+  }
+
+  .ct-hero {
+    padding: 7.5rem 0 3rem;
+  }
+
+  .ct-section {
+    padding: 3.5rem 0 4rem;
+  }
+
+  /* narrower icon and text so the longest email fits on one line */
+  .ct-card {
+    gap: 0.9rem;
+    padding: 1.1rem;
+  }
+
+  .ct-card-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ct-card .ct-line {
+    font-size: 0.9rem;
+  }
+
+  .ct-form {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .ct-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ct-submit {
+    align-self: stretch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ct-card,
+  .ct-submit {
+    transition: none;
+  }
+}

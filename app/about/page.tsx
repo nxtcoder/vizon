@@ -449,7 +449,7 @@ export default function AboutPage() {
             <Link href="/browse-trucks" className="ab-btn">
               Browse Verified Inventory
             </Link>
-            <Link href="/#contact" className="ab-btn">
+            <Link href="/contact" className="ab-btn">
               Become a Channel Partner
             </Link>
           </div>
